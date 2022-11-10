@@ -127,6 +127,38 @@ def baseline_average_V2(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON):
          
       return df_R
   
+def baseline_average_V2_CP(spec_type, Ed_PML,df_PML, df_NASA, df_TARTU, df_HEREON):
+          'Computes reference baselines - assummes even weighting of each submitted team'''
+        
+          df_R = ( 
+                # combine dataframes into a single dataframe
+                pd.concat([df_PML, df_NASA, df_TARTU, df_HEREON])
+                # replace 0 values with nan to exclude them from mean calculation
+                .replace(0, np.nan)
+                .reset_index()
+                # group by the row within the original dataframe
+                .groupby("index")
+                # calculate the mean
+                .mean()
+            )
+           
+           # used to calculate number used in mean - require need 3 or more systems for mean to be defined
+          df_N =  pd.concat([df_PML, df_NASA, df_TARTU, df_HEREON])
+          N_mean = np.zeros(78)
+          for i in range(len(df_R)):
+               no_of_records = 0
+               for j in range(4):
+                   if np.isnan(df_N['400'][i].iloc[j]) == False:
+                       no_of_records =  no_of_records + 1
+                   N_mean[i] = no_of_records
+                   
+           # Ed PML used for timestamps and windspeeds (PML is complete dataset  so copied to reference)    
+          df_R['time_start']  = Ed_PML['time_start'] 
+          df_R['windspeed']  = Ed_PML['windspeed']     
+          df_R['N_mean']  = N_mean    
+             
+          return df_R
+  
     
 def QC_mask(path_QC, Ed_R, Ed_PML, Lsky_PML, Rrs_PML, Rrs_std_PML, path_output):
     
@@ -364,7 +396,7 @@ def plot_dataandQCmasks(Q_mask, Ed_PML, Ed_TARTU, Ed_HEREON, Ed_NASA, Ed_RBINS, 
     return
 
 def filter_by_azimuth(df_PML, df_NASA, df_RBINS, df_CNR, tol=1):
-    '''function to filter NASA and RBINS via azimuth'''   
+    '''function to filter NASA, RBINS, CNR via azimuth'''   
     
     delta_phi_NASA = abs(df_NASA['azimuth']) - abs(df_PML['azimuth'])
     delta_phi_RBINS = abs(df_RBINS['azimuth']) - abs(df_PML['azimuth'])
@@ -383,6 +415,22 @@ def filter_by_azimuth(df_PML, df_NASA, df_RBINS, df_CNR, tol=1):
          
     return df_NASA, df_RBINS, df_CNR
 
+
+def filter_by_azimuth_CP(df_PML, df_NASA, df_NASA_CP, tol=1):
+    '''function to filter just NASA by azimuth - used for CP
+    IP data frame is used for azimuth'''   
+    
+    delta_phi_NASA = abs(df_NASA['azimuth']) - abs(df_PML['azimuth'])
+
+    # delta_phi_NASA = df_NASA['azimuth'] - df_PML['azimuth']
+    
+    for i in range(78):
+       if abs(delta_phi_NASA[i]) > tol:
+         df_NASA_CP.iloc[i] = np.nan
+         
+    return df_NASA
+
+
 def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
     
     plt.figure(figsize=(20,16))
@@ -396,8 +444,6 @@ def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
     plt.xlabel('Station number')
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
-    
-    
     plt.title('RBINS')
     plt.subplot(2,2,2)
     plt.plot(Ed_PML.index, abs(Ed_PML['azimuth']), label= 'PML, TARTU, HEREON',color='orange',linewidth = 3)
@@ -406,7 +452,6 @@ def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
     
-    
     plt.title('CNR')
     plt.subplot(2,2,3)
     plt.plot(Ed_PML.index, abs(Ed_PML['azimuth']), label= 'PML, TARTU, HEREON',color='orange',linewidth = 3)
@@ -414,7 +459,6 @@ def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
     plt.xlabel('Station number')
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
-    
     
     plt.tight_layout(pad=2.4)
     

@@ -377,8 +377,8 @@ def time_match_NOAA(df_NOAA, Ed_PML, bands):
     for i in range(len(time_start_PML)):
          nearest_time, nearest_index = nearest(time_start_NOAA, time_start_PML[i])
          delta_t = abs(time_start_PML[i] - nearest_time) 
-         print(delta_t)
-         print(nearest_index)
+         #   print(delta_t)
+         #  print(nearest_index)
          if delta_t.total_seconds() < tol:
              time_start_NOAA_matching[i] = str(time_start_NOAA[nearest_index]) 
              for j in range(len(df_NOAA.columns)-1):
