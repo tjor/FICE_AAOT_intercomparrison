@@ -395,6 +395,137 @@ def plot_dataandQCmasks(Q_mask, Ed_PML, Ed_TARTU, Ed_HEREON, Ed_NASA, Ed_RBINS, 
     
     return
 
+def plot_dataandQCmasks_4teams(Q_mask, Ed_PML, Ed_TARTU, Ed_HEREON, Ed_NASA, path_output):
+   
+    '''plot to show data and QC masks for AAOT: (i) Data no QC, (ii) QC, 
+    (iii) Data with AOC QC, (vi) Data with cloudiness index w'''
+    # 
+    
+    
+    # 1. plot of all data records
+    # creates plotting mask ,Z,  where records exist
+    Z = np.zeros([4, 78])
+    for i in range(78):
+        for j in range(78):
+            if Ed_NASA.index[j] == i and ~np.isnan(np.array(Ed_NASA['400'])[j]) == 1:
+                Z[0,i] = 1
+            if Ed_HEREON.index[j] == i and ~np.isnan(np.array(Ed_HEREON['400'])[j]) == 1:
+                Z[1,i] = 1
+            if Ed_TARTU.index[j] == i and ~np.isnan(np.array(Ed_TARTU['400'])[j]) == 1:
+                Z[2,i] = 1
+            if Ed_PML.index[j] == i and ~np.isnan(np.array(Ed_PML['400'])[j]) == 1:
+                Z[3,i] = 1
+    
+    # figure for stations
+    plt.figure(figsize=(12,8))
+    plt.rc('font', size=18)       
+    cmap1 = matplotlib.cm.get_cmap('coolwarm')
+    plt.pcolor(Z,edgecolors='k',cmap=cmap1)
+    plt.title('AAOT station mask')
+    
+    plt.xlabel('Station number')
+    ylabels = ['NASA','HEREON', 'TARTU','PML']
+    plt.gca().set_yticklabels(ylabels)
+    plt.gca().set_yticks([0.5,1.5,2.5,3.5])
+    
+    red_patch = mpatches.Patch(color=cmap1(1.001), label='Data')
+    blue_patch = mpatches.Patch(color=cmap1(0), label='No data')
+    plt.legend(handles=[red_patch,blue_patch],loc=3)
+    filename  =  path_output +  'stationmask_4teams.png'
+    plt.savefig(filename)
+    
+    # 2. plot of QC
+    # creates plotting mask ,Z,  where records exist
+    Z = np.zeros([2, 78])
+    Z[0,:] = Q_mask['QC_CI_3']
+    Z[1,:] = Q_mask['QC_AOC_3']
+  
+    # figure for stations
+    plt.figure(figsize=(14,6))
+    plt.rc('font', size=18)      
+    plt.pcolor(Z,edgecolors='k',cmap='coolwarm')
+    plt.title('Quality control mask')
+    ylabels = ['2. Env.' + '\n' + '& CV[$R_{rs}$]', '1. AOC:'  +'\n' +  'SEAPRISM']
+    plt.xlabel('Station number')
+    plt.gca().set_yticklabels(ylabels)
+    plt.gca().set_yticks([0.5,1.5])
+    
+    red_patch = mpatches.Patch(color=cmap1(1.001), label='Pass QC')
+    blue_patch = mpatches.Patch(color=cmap1(0), label='Fail QC')
+    plt.legend(handles=[red_patch,blue_patch],loc=4)  
+    
+    filename  =  path_output + 'QCmask.png'
+    plt.savefig(filename,dpi=300)
+    
+    # 3. plot of data wwith AOC QC
+    
+    # creates plotting mask ,Z, where records exist
+    Z = np.zeros([4, 78])
+    for i in range(78):
+        for j in range(78):
+            if Ed_NASA.index[j] == i and ~np.isnan(np.array(Ed_NASA['400'])[j]) == 1 and Q_mask['QC_AOC_3'][j] == 1:
+                Z[0,i] = 1
+            if Ed_HEREON.index[j] == i and ~np.isnan(np.array(Ed_HEREON['400'])[j]) == 1 and Q_mask['QC_AOC_3'][j] == 1:
+                Z[1,i] = 1
+            if Ed_TARTU.index[j] == i and ~np.isnan(np.array(Ed_TARTU['400'])[j]) == 1 and Q_mask['QC_AOC_3'][j] == 1:
+                Z[2,i] = 1
+            if Ed_PML.index[j] == i and ~np.isnan(np.array(Ed_PML['400'])[j]) == 1 and Q_mask['QC_AOC_3'][j] == 1:
+                Z[3,i] = 1
+    
+    # figure for stations
+    plt.figure(figsize=(12,8))
+    plt.rc('font', size=18)         
+    plt.pcolor(Z,edgecolors='k',cmap='coolwarm')
+    plt.title('AAOT station mask:' + '\n' +  'AOC-SEAPRISM QC and $\geq$ 3 reference systems with data')
+    plt.xlabel('Station number')
+    ylabels = ['NASA','HEREON', 'TARTU','PML']
+    plt.gca().set_yticklabels(ylabels)
+    plt.gca().set_yticks([0.5,1.5,2.5,3.5])
+    
+    red_patch = mpatches.Patch(color=cmap1(1.001), label='Data')
+    blue_patch = mpatches.Patch(color=cmap1(0), label='No data')
+    plt.legend(handles=[red_patch,blue_patch],loc=3)
+    
+    filename  =  path_output  + 'stationmask_QC1_4teams.png'
+    plt.savefig(filename)
+    
+    # 3. plot of data with Cloudiness Index QC
+
+    # creates plotting mask ,Z,  where records exist
+    Z = np.zeros([4, 78])
+    for i in range(78):
+        for j in range(78):
+            if Ed_NASA.index[j] == i and ~np.isnan(np.array(Ed_NASA['400'])[j]) == 1 and Q_mask['QC_CI_3'][j] == 1:
+                Z[0,i] = 1
+            if Ed_HEREON.index[j] == i and ~np.isnan(np.array(Ed_HEREON['400'])[j]) == 1 and Q_mask['QC_CI_3'][j] == 1:
+                Z[1,i] = 1
+            if Ed_TARTU.index[j] == i and ~np.isnan(np.array(Ed_TARTU['400'])[j]) == 1 and Q_mask['QC_CI_3'][j] == 1:
+                Z[2,i] = 1
+            if Ed_PML.index[j] == i and ~np.isnan(np.array(Ed_PML['400'])[j]) == 1 and Q_mask['QC_CI_3'][j] == 1:
+                Z[3,i] = 1
+    
+    # figure for stations
+    plt.figure(figsize=(12,8))
+    plt.rc('font', size=18)         
+    plt.pcolor(Z,edgecolors='k',cmap='coolwarm')
+    plt.title('AAOT station mask:' + '\n' + 'C.I and CV[$R_{rs}$] QC and $\geq$ 3 reference systems with data')
+    
+    plt.xlabel('Station number')
+    ylabels = ['NASA','HEREON', 'TARTU','PML']
+    plt.gca().set_yticklabels(ylabels)
+    plt.gca().set_yticks([0.5,1.5,2.5,3.5])
+    
+    red_patch = mpatches.Patch(color=cmap1(1.001), label='Data')
+    blue_patch = mpatches.Patch(color=cmap1(0), label='No data')
+    plt.legend(handles=[red_patch,blue_patch],loc=3)
+    
+    filename  =  path_output  + 'stationmask_QC2_4teams.png'
+    plt.savefig(filename)
+    
+    return
+
+
+
 def filter_by_azimuth(df_PML, df_NASA, df_RBINS, df_CNR, tol=1):
     '''function to filter NASA, RBINS, CNR via azimuth'''   
     

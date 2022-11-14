@@ -122,7 +122,7 @@ def read_hyperspectral(institute, var):
             root = h5py.File(files[i], 'r')
             data = pd.DataFrame(root[grp][var][()]) # spectral data
             data_unc = pd.DataFrame(root[grp_unc][var_unc][()]) # uncertainty of spectral data 
-            time[i] = convert_datetime(data['Datetag'], data['Timetag2'])
+            time[i] = convert_datetime(data['Datetag'],  data['Timetag2'])
             root.close()
         
             # convert unit to align Seabird and trios in the same unit

@@ -257,6 +257,81 @@ def plot_scatter_CP(spec_type,df_R, df_PML, df_NASA, df_TARTU, df_HEREON, bands,
     return
 
 
+def plot_scatter_CP_vs_IP(spec_type, df_PML_IP, df_NASA_IP, df_TARTU_IP, df_HEREON_IP, df_PML_CP, df_NASA_CP, df_TARTU_CP, df_HEREON_CP, bands, path_output,  Q_mask, Qtype = 'AOC_3'):
+    '''  scatter plot - variant that plots IP versus CP processed data'''
+  
+    # qc filter
+    df_PML_IP = df_PML_IP[Q_mask[Qtype]==1]
+    df_NASA_IP = df_NASA_IP[Q_mask[Qtype]==1]
+    df_TARTU_IP = df_TARTU_IP[Q_mask[Qtype]==1]
+    df_HEREON_IP = df_HEREON_IP[Q_mask[Qtype]==1]
+    
+    df_PML_CP = df_PML_CP[Q_mask[Qtype]==1]
+    df_NASA_CP = df_NASA_CP[Q_mask[Qtype]==1]
+    df_TARTU_CP = df_TARTU_CP[Q_mask[Qtype]==1]
+    df_HEREON_CP = df_HEREON_CP[Q_mask[Qtype]==1]
+    
+    # scatter plot figure
+    fig = plt.figure(figsize=(20,6))
+    plt.rc('font', size=16)      
+    if spec_type == 'Ed':
+        xlab ='CP: $E_{d}^{r}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$]'
+        ylab = 'IP: $E_{d}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$]'
+        limits = [800, 1650]
+        ticks = [800, 1000, 1200,1400, 1600]
+        plt.suptitle('Individual versus Community Processor: $E_{d}$(0$^{+}$,$\lambda$)')
+    elif spec_type == 'Lsky':
+        xlab ='CP: $L_{sky}^{r}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        ylab = 'IP: $L_{sky}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        limits = [0, 130]
+        ticks = [0, 30, 60, 90, 120]
+        plt.suptitle('Individual versus Community Processor: $L_{sky}$(0$^{+}$,$\lambda$)')
+    elif spec_type == 'Lt':
+        xlab ='CP: $L_{t}^{r}$(0$^{+})$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        ylab = 'IP: $L_{t}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        limits = [0, 25]
+        ticks = [0, 5, 10, 15, 20 , 25]
+        plt.suptitle('Individual versus Community Processor: $L_{t}$(0$^{+}$,$\lambda$)')
+    elif spec_type == 'Rrs':
+        xlab ='CP: Reference: $R_{rs}^{r}$($\lambda)$ [sr$^{-1}$]'
+        ylab = 'IP: $R_{rs}$($\lambda)$ [sr$^{-1}$]'
+        limits = [0, 0.016]
+        ticks = [0, 0.004, 0.008, 0.012, 0.016]
+        plt.suptitle('Individual versus Community Processor: $R_{rs}$(0$^{+}$, $\lambda$)')
+    elif spec_type == 'nLw':
+        xlab ='CP: $L_{wn}^{r}$($\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        ylab = 'IP: $L_{nw}$($\lambda)$ [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+        limits = [0, 25]
+        ticks = [0, 5, 10, 15, 20 , 25]
+        plt.suptitle('Individual versus Community Processor: $L_{wn}$($\lambda$)')
+       
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+        
+    # subplots
+    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
+    index = 1
+    scatter_subplot_CP(spec_type,subtitle, index, ylab, xlab, limits, ticks, df_PML_CP, df_PML_IP,bands)
+    
+    subtitle = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
+    index = 2
+    scatter_subplot_CP(spec_type,subtitle, index,  ylab, xlab, limits, ticks, df_HEREON_CP, df_HEREON_IP,bands)
+    
+    subtitle = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
+    index = 3
+    scatter_subplot_CP(spec_type,subtitle, index, ylab, xlab, limits, ticks, df_TARTU_CP, df_TARTU_IP,bands)
+    
+    subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
+    index = 4
+    scatter_subplot_CP(spec_type,subtitle, index, ylab, xlab, limits, ticks, df_NASA_CP, df_NASA_IP,bands)
+    
+    filename  =  path_output +  '/' + spec_type + '_scattterplot_CP_vs_IP.png'
+    plt.savefig(filename)
+    
+    plt.tight_layout(pad=1.8) 
+    
+    return
+
 
 
 def _resid_subplot(spec_type,system, plot_index, ylab, percent_limits, df_sys, df_R ,bands):
@@ -281,6 +356,49 @@ def _resid_subplot(spec_type,system, plot_index, ylab, percent_limits, df_sys, d
 
     #
     plt.subplot(2,4,plot_index) 
+    plt.title(system)
+    plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
+    bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(0.5,10.5)
+    plt.ylim(-percent_limits, percent_limits)
+    for i in range(10):
+        bp['boxes'][i].set_facecolor(colors[i])
+   
+    plt.xticks([1,2,3,4,5,6,7,8,9,10], bands[0:10])
+    plt.xticks(rotation = 45)
+    
+    plt.grid(axis='y') 
+    
+    #if plot_index==1 or plot_index== 5:
+     #   plt.ylabel(ylab)
+    #if plot_index > 3:
+     #   plt.xlabel('Wavelength [nm]')
+  
+    return
+
+
+def _resid_subplot_CP(spec_type,system, plot_index, ylab, percent_limits, df_sys, df_R ,bands):
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,10)) 
+    
+    if spec_type == 'nLw':
+        resid = [] # res
+        resid.append([])
+        for i in range(1,8,1):# residual disrtibution in each band
+            resid_i = 100*np.array((df_sys[str(bands[i])] -  df_R[str(bands[i])])/df_R[str(bands[i])])
+            resid_i = resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+        resid.append([])
+        resid.append([])
+    else:
+        resid = [] # residual distribution in each band
+        for i in range(10):
+            resid_i = 100*np.array((df_sys[str(bands[i])] -  df_R[str(bands[i])])/df_R[str(bands[i])])
+            resid_i =  resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+
+    #
+    plt.subplot(1,4,plot_index) 
     plt.title(system)
     plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -446,7 +564,7 @@ def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, ban
     df_R = df_R[Q_mask[Qtype]==1]
     
     # spectral reiduals plot
-    fig= plt.figure(figsize=(18,8))
+    fig= plt.figure(figsize=(18,6))
     plt.rc('font',size=16)  
     if spec_type == 'Ed':
         ylab = '$E_{d}$ residual [%]'
@@ -493,6 +611,73 @@ def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, ban
     
     filename  =  path_output +  '/' + spec_type + '_resiudalsplot_CP.png'
     plt.savefig(filename)
+    
+    return
+
+def plot_residuals_CP_vs_IP(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON, df_PML_CP, df_NASA_CP, df_TARTU_CP, df_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    ''' version of residuals that shows CP verus IP processed data'''  
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+    df_NASA = df_NASA[Q_mask[Qtype]==1]
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+    
+    df_PML_CP = df_PML_CP[Q_mask[Qtype]==1]
+    df_NASA_CP = df_NASA_CP[Q_mask[Qtype]==1]
+    df_TARTU_CP = df_TARTU_CP[Q_mask[Qtype]==1]
+    df_HEREON_CP = df_HEREON_CP[Q_mask[Qtype]==1]
+    
+    # spectral reiduals plot
+    fig= plt.figure(figsize=(18,8))
+    plt.rc('font',size=16)  
+    if spec_type == 'Ed':
+        ylab = '$E_{d}$ residual, $\Delta$ [%]'
+        plt.suptitle('Percentage residuals for $E_{d}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')
+        percent_limits = 15
+    if spec_type == 'Lsky':
+         ylab = '$L_{sky}$ residual, $\Delta$  [%]'
+         plt.suptitle('Percentage residuals for $L_{sky}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')
+         percent_limits = 15
+    if spec_type == 'Lt':
+         ylab = '$L_{t}$ residual, $\Delta$ [%]'
+         plt.suptitle('Percentage residuals for $L_{t}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')
+         percent_limits = 15
+    if spec_type == 'Rrs':
+          ylab = '$R_{rs}$ residual, $\Delta$  [%]'
+          plt.suptitle('Percentage residuals for $R_{rs}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')  
+          percent_limits = 20
+    if spec_type == 'nLw':
+          ylab = '$L_{wn}$ residual, $\Delta$  [%]'
+          percent_limits = 40
+          plt.suptitle('Percentage residuals for $L_{nw}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')
+
+    xlab = 'Wavelength'
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+        
+    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
+    index = 1
+    _resid_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_PML, df_PML_CP ,bands)
+    
+    subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
+    index = 2
+    _resid_subplot_CP(spec_type,subtitle, index, ylab,percent_limits, df_HEREON, df_HEREON_CP ,bands)
+    
+    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
+    index = 3
+    _resid_subplot_CP(spec_type,subtitle, index, ylab, percent_limits, df_TARTU, df_TARTU_CP ,bands)
+
+    subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
+    index = 4
+    _resid_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_NASA, df_NASA_CP ,bands)
+    
+    plt.tight_layout(pad=1.6)    
+    
+    filename  =  path_output +  '/' + spec_type + '_resiudalsplot_CP_vs_IP.png'
+    plt.savefig(filename)
+    
+    
     
     return
 
