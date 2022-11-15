@@ -404,3 +404,4 @@ if __name__ == '__main__':
     
     Ed_NASA, Lsky_NASA,  Lt_NASA,  Rrs_NASA = time_match_allvars(Ed_NASA_IP, Ed_NASA, Lsky_NASA, Lt_NASA, Rrs_NASA, bands)
     
+    
