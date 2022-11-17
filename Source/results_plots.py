@@ -420,6 +420,50 @@ def _resid_subplot_CP(spec_type,system, plot_index, ylab, percent_limits, df_sys
     return
 
 
+
+def _unc_subplot_CP(spec_type,system, plot_index, ylab, percent_limits, df_sys ,bands):
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,10)) 
+    
+    if spec_type == 'nLw':
+        resid = [] # res
+        resid.append([])
+        for i in range(1,8,1):# residual disrtibution in each band
+            resid_i = np.array((df_sys[str(bands[i])]))
+            resid_i = resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+        resid.append([])
+        resid.append([])
+    else:
+        resid = [] # residual distribution in each band
+        for i in range(10):
+            resid_i =  np.array((df_sys[str(bands[i])]))
+            resid_i =  resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+
+    #
+    plt.subplot(1,4,plot_index) 
+    plt.title(system)
+    plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
+    bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(0.5,10.5)
+    plt.ylim(0, percent_limits)
+    for i in range(10):
+        bp['boxes'][i].set_facecolor(colors[i])
+   
+    plt.xticks([1,2,3,4,5,6,7,8,9,10], bands[0:10])
+    plt.xticks(rotation = 45)
+    
+    plt.grid(axis='y') 
+    
+    #if plot_index==1 or plot_index== 5:
+     #   plt.ylabel(ylab)
+    #if plot_index > 3:
+     #   plt.xlabel('Wavelength [nm]')
+  
+    return
+
+
 def plot_residuals(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_RBINS, df_CNR, df_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
     ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
     
@@ -464,7 +508,7 @@ def plot_residuals(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_RBI
           percent_limits_2 = 40
           plt.suptitle('Percentage residuals for normalized water-leaving radiance: $L_{wn}$($\lambda$)')
 
-    xlab = 'Wavelength'
+    xlab = 'Wavelength [nm]'
     fig.supxlabel(xlab)
     fig.supylabel(ylab)
         
@@ -552,6 +596,7 @@ def plot_residuals(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_RBI
     
     return
 
+
 def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
     ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
     
@@ -587,7 +632,7 @@ def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, ban
           percent_limits = 40
           plt.suptitle('Percentage residuals for normalized water-leaving radiance: $L_{wn}$($\lambda$)')
 
-    xlab = 'Wavelength'
+    xlab = 'Wavelength [nm]'
     fig.supxlabel(xlab)
     fig.supylabel(ylab)
         
@@ -652,7 +697,7 @@ def plot_residuals_CP_vs_IP(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON, df_
           percent_limits = 40
           plt.suptitle('Percentage residuals for $L_{nw}$: $\Delta = 100(X_{IP} - X_{CP})/X_{CP}$')
 
-    xlab = 'Wavelength'
+    xlab = 'Wavelength [nm]'
     fig.supxlabel(xlab)
     fig.supylabel(ylab)
         
@@ -678,6 +723,68 @@ def plot_residuals_CP_vs_IP(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON, df_
     plt.savefig(filename)
     
     
+    
+    return
+
+
+def plot_unc_CP(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+   # df_NASA = df_NASA[Q_mask[Qtype]==1]
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+    
+    
+    # spectral reiduals plot
+    fig= plt.figure(figsize=(18,6))
+    plt.rc('font',size=16)  
+    if spec_type == 'Ed':
+        ylab = '$E_{d}$ uncertainty [%]'
+        plt.suptitle('Uncertainty distribution (post QC) for downwelling irradiance: $E_{d}$(0$^{+}$,$\lambda$)')
+        percent_limits = 2
+    if spec_type == 'Lsky':
+         ylab = '$L_{sky}$ uncertainty [%]'
+         plt.suptitle('Uncertainty distribution (post QC) for sky radiance: $L_{sky}$(0$^{+}$,$\lambda$)')
+         percent_limits = 2
+    if spec_type == 'Lt':
+         ylab = '$L_{t}$ uncertainty [%]'
+         plt.suptitle('Uncertainty distribution (post QC) upwelling radiance: $L_{t}$(0$^{+}$,$\lambda$)')
+         percent_limits = 2
+    if spec_type == 'Rrs':
+          ylab = '$R_{rs}$ uncertainty [%]'
+          plt.suptitle('Uncertainty distribution (post QC) for remote-sensing reflectance: $R_{rs}$($\lambda$)')
+          percent_limits = 2
+    if spec_type == 'nLw':
+          ylab = '$L_{wn}$ uncertainty [%]'
+          percent_limits = 2
+          plt.suptitle('Uncertainty distribution (post QC) for normalized water-leaving radiance: $L_{wn}$($\lambda$)')
+
+    xlab = 'Wavelength [nm]'
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+        
+    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['400'])))
+    index = 1
+    _unc_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_PML,bands)
+    
+    subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['400'])))
+    index = 2
+    _unc_subplot_CP(spec_type,subtitle, index, ylab,percent_limits, df_HEREON,bands)
+    
+    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['400'])))
+    index = 3
+    _unc_subplot_CP(spec_type,subtitle, index, ylab, percent_limits, df_TARTU,bands)
+
+    #subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
+    #index = 4
+   # _unc_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_NASA, bands)
+        
+    plt.tight_layout()
+    
+    filename  =  path_output +  '/' + spec_type + '_uncplot_CP.png'
+    plt.savefig(filename)
     
     return
 
@@ -780,7 +887,7 @@ def tabular_summary(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_RB
 
     filename  =  path_output +  '/' + spec_type + '_summary.csv'
     summary.to_csv(filename, na_rep ='NaN', index = False)
-    filename2  =  path_output +  '/' + spec_type + '_summary.png'
+    filename2  =  path_output +  '/' + spec_type + '_summary.png' 
 
     dfi.export(summary.style.hide(axis='index'), filename2)
     

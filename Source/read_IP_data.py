@@ -150,9 +150,9 @@ def read_TARTU_data(path, bands):
     Lt = read_TARTU_spec(path, 'ramses3_above_lu_average', bands)
     Rrs = read_TARTU_spec(path, 'ramses3_above_reflectance_average', bands) 
     Rrs_std = read_TARTU_spec(path, 'ramses3_above_reflectance_standardDeviation', bands)
-    nLw = read_TARTU_spec(path, 'ramses3_above_nlw_average', bands) # yet to arrive
+#    nLw = read_TARTU_spec(path, 'ramses3_above_nlw_average', bands) # yet to arrive
     
-    return Ed, Lsky, Lt, Rrs, Rrs_std, nLw
+    return Ed, Lsky, Lt, Rrs, Rrs_std
 
 def read_TARTU_spec(path, S, bands): 
     'Returns dataframe for spectral type S, OLCI bands as columns, indexed by station'
@@ -257,9 +257,9 @@ def read_HEREON_data(path, bands):
     Lt = read_HEREON_spec(path, 'lt_average', bands)
     Rrs = read_HEREON_spec(path, 'reflectance_average', bands) 
     Rrs_std = read_HEREON_spec(path, 'reflectance_standardDeviation', bands) 
-    nLw = read_HEREON_spec(path, 'lw_average', bands) 
+  #  nLw = read_HEREON_spec(path, 'lw_average', bands) 
     
-    return Ed, Lsky, Lt, Rrs, Rrs_std, nLw
+    return Ed, Lsky, Lt, Rrs, Rrs_std
 
 
 def read_HEREON_spec(path, S, bands): 
@@ -482,4 +482,23 @@ def read_Aeronet_nLw(path_NLW, Ed_R, bands):
     df_R['time_start']  = Ed_R['time_start'] 
     
     return df_R
+
+
+def nLw_usingPMLBRDF(nLw_PML, Rrs_PML, Rrs_ins, institution, bands):
+    ''' function to derrive TARTU & HEREON nLW using PML BRDF
+    Based on re-arranging eq. 4 in Tiltstone 2020'''
     
+  
+    station = np.arange(0,78)
+    nLw_ins = pd.DataFrame(index = station) 
+    
+    scale_factor = nLw_PML.iloc[:,3:23]/Rrs_PML.iloc[:,3:23] # == BRDF*F_O
+    
+    if institution == 'TARTU':
+        nLw_ins =  scale_factor*Rrs_ins.iloc[:,2:21]
+    elif institution == 'HEREON':
+        nLw_ins =  scale_factor*Rrs_ins
+    
+    return nLw_ins, scale_factor
+    
+
