@@ -104,6 +104,8 @@ def read_hyperspectral(institute, var):
     dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/"  + institute 
     files = glob.glob(dir_data + "/*.hdf")
     
+    
+    
     # extract no. of timestamps (==stations) and no. of wavelengths
     root = h5py.File(files[0], 'r') # read 1st file to read wavelength
     data = pd.DataFrame(root[grp][var][()])
@@ -111,52 +113,53 @@ def read_hyperspectral(institute, var):
     N_wv = len(wv)
     N_stat = len(files)   
     
-    if institute != 'NASA': # includes uncertainty
-        # define empty data matrices
-        cp_data = np.nan*np.ones([N_stat, N_wv])
-        cp_unc = np.nan*np.ones([N_stat, N_wv])
-        time = np.empty(N_stat, dtype=object)
-        
-        for i in range(len(files)):
-            
-            root = h5py.File(files[i], 'r')
-            data = pd.DataFrame(root[grp][var][()]) # spectral data
-            data_unc = pd.DataFrame(root[grp_unc][var_unc][()]) # uncertainty of spectral data 
-            time[i] = convert_datetime(data['Datetag'],  data['Timetag2'])
-            root.close()
-        
-            # convert unit to align Seabird and trios in the same unit
-            if "Rrs" not in var:
-                scale_unit = 1e-3/1e-4 
-                cp_data[i,:] = data.iloc[0][2:]
-                cp_unc[i, :] = data_unc.iloc[0][:] 
-            else:
-                cp_data[i,:] = data.iloc[0][2:]
-                cp_unc[i,:] = data_unc.iloc[0][2:] 
-                
-            if institute == 'PML' and "Rrs" not in var:
-                cp_data[i,:] = 10*cp_data[i,:]
-                cp_unc[i,:] = 10*cp_unc[i,:]
+    # if institute != 'NASA': # includes uncertainty
+    # define empty data matrices
     
-    else: # does not include uncertainty (just NASA)
+    cp_data = np.nan*np.ones([N_stat, N_wv])
+    cp_unc = np.nan*np.ones([N_stat, N_wv])
+    time = np.empty(N_stat, dtype=object)
+    
+    for i in range(len(files)):
         
-        cp_data = np.nan*np.ones([N_stat, N_wv])
-        time = np.empty(N_stat, dtype=object)
-        cp_unc = None
-        
-        for i, f in enumerate(sorted(files)):
+        root = h5py.File(files[i], 'r')
+        data = pd.DataFrame(root[grp][var][()]) # spectral data
+        data_unc = pd.DataFrame(root[grp_unc][var_unc][()]) # uncertainty of spectral data 
+        time[i] = convert_datetime(data['Datetag'],  data['Timetag2'])
+        root.close()
+    
+        # convert unit to align Seabird and trios in the same unit
+        if "Rrs" not in var:
+            scale_unit = 1e-3/1e-4 
+            cp_data[i,:] = data.iloc[0][2:]
+            cp_unc[i, :] = 100*data_unc.iloc[0][:] # convert to % units
+        else:
+            cp_data[i,:] = data.iloc[0][2:] 
+            cp_unc[i,:] = 100*data_unc.iloc[0][2:] # convert to % units
+            
+        if (institute == 'PML' or institute == 'NASA') and "Rrs" not in var:
+            cp_data[i,:] = scale_unit*cp_data[i,:]
            
-            root = h5py.File(f, 'r')
-            data = pd.DataFrame(root[grp][var][()]) # spectral data
-            time[i] = convert_datetime(data['Datetag'], data['Timetag2'])
-            root.close()
+    
+    #else: # does not include uncertainty (just NASA)
+    #    
+    #    cp_data = np.nan*np.ones([N_stat, N_wv])
+    #    time = np.empty(N_stat, dtype=object)
+    #    cp_unc = None
+        
+    #    for i, f in enumerate(sorted(files)):
+           
+    #        root = h5py.File(f, 'r')
+    #        data = pd.DataFrame(root[grp][var][()]) # spectral data
+    #        time[i] = convert_datetime(data['Datetag'], data['Timetag2'])
+    #        root.close()
         
             # convert unit to align Seabird and trios in the same unit
-            if "Rrs" not in var:
-                scale_unit = 1e-3/1e-4 
-                cp_data[i,:] = scale_unit*data.iloc[0][2:]
-            else:
-                cp_data[i,:] = data.iloc[0][2:]
+   #         if "Rrs" not in var:
+   #             scale_unit = 1e-3/1e-4 
+    #            cp_data[i,:] = scale_unit*data.iloc[0][2:]
+    #        else:
+     #           cp_data[i,:] = data.iloc[0][2:]
               
     return cp_data, cp_unc, time, wv
 
@@ -279,16 +282,16 @@ def read_CP_data(institute, Ed_IP, bands):
     Lt = hyperspec_to_OLCIbands(Lt, time, wv, srf, srf_bands, srf_wv) 
     Rrs = hyperspec_to_OLCIbands(Rrs, time, wv, srf, srf_bands, srf_wv) 
     
-    if institute != 'NASA':
-        Ed_unc = hyperspec_to_OLCIbands(Ed_unc, time, wv, srf, srf_bands, srf_wv)  
-        Lsky_unc = hyperspec_to_OLCIbands(Lsky_unc, time, wv, srf, srf_bands, srf_wv)  
-        Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
-        Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv) 
+    #   if institute != 'NASA':
+    Ed_unc = hyperspec_to_OLCIbands(Ed_unc, time, wv, srf, srf_bands, srf_wv)  
+    Lsky_unc = hyperspec_to_OLCIbands(Lsky_unc, time, wv, srf, srf_bands, srf_wv)  
+    Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
+    Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv) 
     
     # Timestamp mathcing to IP-processed data
     Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands)
-    if institute != 'NASA':
-        Ed_unc, Lsky_unc, Lt_unc,  Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
+    #if institute != 'NASA':
+    Ed_unc, Lsky_unc, Lt_unc,  Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
           
     return  Ed, Ed_unc, Lsky, Lsky_unc, Lt, Lt_unc, Rrs, Rrs_unc
 
@@ -390,8 +393,8 @@ if __name__ == '__main__':
     Ed_NASA_IP, Lsky_NASA_IP, Lt_NASA_IP, Rrs_NASA_IP, Rrs_std_NASA_IP, nLw_NASA_IP = rd_IP.read_NASA_data(path_NASA, bands)
     Ed_TARTU_IP, Lsky_TARTU_IP, Lt_TARTU_IP, Rrs_TARTU_IP, Rrs_std_TARTU_IP, nLw_TARTU_IP = rd_IP.read_TARTU_data(path_TARTU, bands)
     Ed_HEREON_IP, Lsky_HEREON_IP, Lt_HEREON_IP, Rrs_HEREON_IP, Rrs_std_HEREON_IP, nLw_HEREON_IP = rd_IP.read_HEREON_data(path_HEREON, bands)
-
-
+    
+    
     # time-stamp matching
     Ed_PML, Lsky_PML,  Lt_PML, Rrs_PML = time_match_allvars(Ed_PML_IP, Ed_PML, Lsky_PML, Lt_PML, Rrs_PML, bands)
     Ed_unc_PML, Lsky_unc_PML, Lt_unc_PML,  Rrs_PML_unc = time_match_allvars(Ed_PML_IP, Ed_unc_PML, Lsky_unc_PML, Lt_unc_PML, Rrs_unc_PML, bands)
@@ -404,4 +407,31 @@ if __name__ == '__main__':
     
     Ed_NASA, Lsky_NASA,  Lt_NASA,  Rrs_NASA = time_match_allvars(Ed_NASA_IP, Ed_NASA, Lsky_NASA, Lt_NASA, Rrs_NASA, bands)
     
+        
+    
+    # time_start_NASA_IP = np.empty(len(Ed_NASA_IP), dtype=object)
+    # for i in range(len(Ed_NASA_IP)):
+    #    if Ed_NASA_IP['time_start'][i] != None:
+    #        time_start_NASA_IP[i] = datetime.datetime.strptime(
+    #            Ed_NASA_IP['time_start'][i], '%Y-%m-%d %H:%M:%S')
+    # plt.figure(figsize=(12, 6))
+    # plt.title('Ed(560): CP (all submitted data) versus IP (station matches)')
+    # plt.plot_date(time_start_NASA_IP, Ed_NASA_IP['560'], ms=5, label='NASA: IP', color='blue')
+    # plt.plot_date(time_NASA, Ed_NASA['560.0'], ms=3, label='NASA: CP', color='red')
+    # plt.xlabel('UTC time [hrs]')
+    # plt.ylabel('[mW m$^{-2}$ nm$^{-1}$]')
+    # plt.legend()
+    
+    # time_start_NASA_IP = np.empty(len(Ed_NASA_IP), dtype=object)
+    # for i in range(len(Ed_NASA_IP)):
+    #   if Ed_NASA_IP['time_start'][i] != None:
+    #        time_start_NASA_IP[i] = datetime.datetime.strptime(
+    #            Ed_NASA_IP['time_start'][i], '%Y-%m-%d %H:%M:%S')
+    #plt.figure(figsize=(12, 6))
+    # plt.title('Ed(560): CP (station matches) versus IP (station matches)')
+    # plt.plot_date(time_start_NASA_IP, Ed_NASA_IP['560'], ms=5, label='NASA: IP', color='blue')
+    # plt.plot_date(time_start_NASA_IP, Ed_NASA['560'], ms=3, label='NASA: CP', color='red')
+    # plt.xlabel('UTC time [hrs]')
+    # plt.ylabel('[mW m$^{-2}$ nm$^{-1}$]')
+    # plt.legend()
     

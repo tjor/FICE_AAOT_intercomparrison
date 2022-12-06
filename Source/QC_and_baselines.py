@@ -559,7 +559,7 @@ def filter_by_azimuth_CP(df_PML, df_NASA, df_NASA_CP, tol=1):
        if abs(delta_phi_NASA[i]) > tol:
          df_NASA_CP.iloc[i] = np.nan
          
-    return df_NASA
+    return df_NASA_CP
 
 
 def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
