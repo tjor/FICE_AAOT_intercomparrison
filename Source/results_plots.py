@@ -198,7 +198,7 @@ def plot_scatter_CP(spec_type,df_R, df_PML, df_NASA, df_TARTU, df_HEREON, bands,
     df_R = df_R[Q_mask[Qtype]==1]
     
     # scatter plot figure
-    fig = plt.figure(figsize=(18,6))    
+    fig = plt.figure(figsize=(20,6))    
     plt.rc('font', size=18)      
     if spec_type == 'Ed':
         xlab ='Reference: $E_{d}^{r}$(0$^{+}$, $\lambda)$ [mW m$^{-2}$ nm$^{-1}$]'
@@ -1047,19 +1047,19 @@ def plot_unc_CP(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_out
     fig.supxlabel(xlab)
     fig.supylabel(ylab)
         
-    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['400'])))
+    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
     index = 1
     _unc_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_PML,bands)
     
-    subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['400'])))
+    subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
     index = 2
     _unc_subplot_CP(spec_type,subtitle, index, ylab,percent_limits, df_HEREON,bands)
     
-    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['400'])))
+    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
     index = 3
     _unc_subplot_CP(spec_type,subtitle, index, ylab, percent_limits, df_TARTU,bands)
 
-    subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
+    subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['560'])))
     index = 4
     _unc_subplot_CP(spec_type, subtitle, index, ylab, percent_limits, df_NASA, bands)
         

@@ -101,7 +101,7 @@ def read_hyperspectral(institute, var):
         unit = "1/sr"
     
     # locate hdf files for each institute
-    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/"  + institute 
+    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/CP_common_processing/"  + institute + '/L2/' # common=proces
     files = glob.glob(dir_data + "/*.hdf")
     
     
