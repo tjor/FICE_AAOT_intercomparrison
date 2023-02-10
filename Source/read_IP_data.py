@@ -445,7 +445,7 @@ def read_CNR_spec(path, S, bands):
 def read_Aeronet_nLw(path_NLW, Ed_R, bands):
     ''' function to read nLw 1.5 data - assumes similar format to baseline _R dataframes
     Based on nearest neighbour interpolation within a +/- 10 minute tolerance to be counted.
-    Note : 667 nm band is currently interpreted as 665 nm OLCI band (may need interpolating later on)
+    Note : 667 nm band is currently interpreted as 665 nm OLCI band 
     Units are mw/(cm^2 sr micro-m) - multiply by 10 to get  mw/(m^2 sr nm)'''
     
     # extract nLw data in data frame formate

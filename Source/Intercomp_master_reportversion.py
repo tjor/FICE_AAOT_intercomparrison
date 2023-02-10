@@ -217,7 +217,8 @@ if __name__ == '__main__':
     # rp.residuals_combined('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     # rp.residuals_combined('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
     # rp.residuals_combined('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
-    # rp.residuals_combined_nlw('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    #
+    rp.residuals_combined_nlw('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     rp.SB_VS_HP('nLw', nLw_SEAPRISM, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
 
     ############################################################################
@@ -228,5 +229,21 @@ if __name__ == '__main__':
     # Lt_table = rp.tabular_summary('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     # Rrs_table = rp.tabular_summary('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     # nLw = rp.tabular_summary('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+  
+    filename  =  path_output +  '/'  + 'Ed_stations_NOAA.csv'
+    Ed_NOAA.to_csv(filename, na_rep ='NaN', index = False)
     
+    filename  =  path_output +  '/'  + 'Ed_stations_PML.csv'
+    Ed_PML.to_csv(filename, na_rep ='NaN', index = False)
     
+    filename  =  path_output +  '/'  + 'Ed_stations_Reference.csv'
+    Ed_R.to_csv(filename, na_rep ='NaN', index = False)
+    
+    filename  =  path_output +  '/'  + 'nLw_stations_NOAA.csv'
+    nLw_NOAA.to_csv(filename, na_rep ='NaN', index = False)
+    
+    filename  =  path_output +  '/'  + 'nLw_stations_SEAPRISM.csv'
+    nLw_SEAPRISM.to_csv(filename, na_rep ='NaN', index = False)
+
+    filename  =  path_output +  '/'  + 'QC_mask.csv'
+    Q_mask.to_csv(filename, na_rep ='NaN', index = False)

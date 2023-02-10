@@ -588,138 +588,6 @@ def _unc_subplot_CP(spec_type,system, plot_index, ylab, percent_limits, df_sys ,
     return
 
 
-def plot_residuals(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_RBINS, df_CNR, df_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
-    ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
-    
-    # QC filtering 
-    df_PML = df_PML[Q_mask[Qtype]==1]
-    df_NASA = df_NASA[Q_mask[Qtype]==1]
-    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
-    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
-    df_RBINS = df_RBINS[Q_mask[Qtype]==1]
-    df_CNR = df_CNR[Q_mask[Qtype]==1]
-    df_NOAA = df_NOAA[Q_mask[Qtype]==1]
-    
-    
-    df_R = df_R[Q_mask[Qtype]==1]
-    
-    # spectral reiduals plot
-    fig= plt.figure(figsize=(18,12))
-    plt.rc('font',size=16)  
-    if spec_type == 'Ed':
-        ylab = '$E_{d}$ residual [%]'
-        plt.suptitle('Percentage residuals for downwelling irradiance: $E_{d}$(0$^{+}$,$\lambda$)')
-        percent_limits = 10
-        percent_limits_2 = 10
-    if spec_type == 'Lsky':
-         ylab = '$L_{sky}$ residual [%]'
-         plt.suptitle('Percentage residuals for sky radiance: $L_{sky}$(0$^{+}$,$\lambda$)')
-         percent_limits = 10
-         percent_limits_2 = 10
-    if spec_type == 'Lt':
-         ylab = '$L_{t}$ residual [%]'
-         plt.suptitle('Percentage residuals for upwelling radiance: $L_{t}$(0$^{+}$,$\lambda$)')
-         percent_limits = 10
-         percent_limits_2 = 10
-    if spec_type == 'Rrs':
-          ylab = '$R_{rs}$ residual [%]'
-          plt.suptitle('Percentage residuals for remote-sensing reflectance: $R_{rs}$($\lambda$)')
-          percent_limits = 16
-          percent_limits_2 = 16
-    if spec_type == 'nLw':
-          ylab = '$L_{wn}$ residual [%]'
-          percent_limits = 40
-          percent_limits_2 = 40
-          plt.suptitle('Percentage residuals for normalized water-leaving radiance: $L_{wn}$($\lambda$)')
-
-    xlab = 'Wavelength [nm]'
-    fig.supxlabel(xlab)
-    fig.supylabel(ylab)
-        
-    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['400'])))
-    index = 1
-    _resid_subplot(spec_type, subtitle, index, ylab, percent_limits, df_PML, df_R ,bands)
-    
-    subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['400'])))
-    index = 2
-    _resid_subplot(spec_type,subtitle, index, ylab,percent_limits, df_HEREON, df_R ,bands)
-    
-    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['400'])))
-    index = 3
-    _resid_subplot(spec_type,subtitle, index, ylab, percent_limits, df_TARTU, df_R ,bands)
-
-   
-    if spec_type == 'Lsky' :
-
-        subtitle  = 'RBINS: N = ' + str(np.sum(~np.isnan(df_RBINS['400'])))
-        index = 5
-        _resid_subplot(spec_type,subtitle, index, ylab,percent_limits_2, df_RBINS, df_R ,bands)
-        
-        subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
-        index = 4
-        _resid_subplot(spec_type, subtitle, index, ylab, percent_limits_2, df_NASA, df_R ,bands)
-        
-        subtitle  = 'CNR: N = ' + str(np.sum(~np.isnan(df_CNR['400'])))
-        index = 6
-        _resid_subplot(spec_type, subtitle, index, ylab, percent_limits_2, df_CNR, df_R ,bands)
-   
-    elif spec_type == 'Lt' :
-        
-        subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
-        index = 4
-        _resid_subplot(spec_type, subtitle, index, ylab, percent_limits, df_NASA, df_R ,bands)
-        
-        subtitle  = 'RBINS: N = ' + str(np.sum(~np.isnan(df_RBINS['400'])))
-        index = 5
-        _resid_subplot(spec_type,subtitle, index, ylab,percent_limits_2, df_RBINS, df_R ,bands)
-    
-                
-        subtitle  = 'CNR: N = ' + str(np.sum(~np.isnan(df_CNR['400'])))
-        index = 6
-        _resid_subplot(spec_type,subtitle, index, ylab,percent_limits_2, df_CNR, df_R ,bands)
-        
-    elif spec_type == 'Rrs' :
-          
-        subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
-        index = 4
-        _resid_subplot(spec_type, subtitle, index, ylab, percent_limits, df_NASA, df_R ,bands)
-        
-        subtitle  = 'RBINS: N = ' + str(np.sum(~np.isnan(df_RBINS['400'])))
-        index = 5
-        _resid_subplot(spec_type,subtitle, index, ylab,percent_limits_2, df_RBINS, df_R ,bands)
-    
-        subtitle  = 'CNR: N = ' + str(np.sum(~np.isnan(df_CNR['400'])))
-        index = 6
-        _resid_subplot(spec_type,subtitle, index, ylab,percent_limits_2, df_CNR, df_R ,bands)
-   
-    else: 
-
-      subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
-      index = 4
-      _resid_subplot(spec_type, subtitle, index, ylab, percent_limits, df_NASA, df_R ,bands)
-      
-      subtitle  = 'RBINS: N = ' + str(np.sum(~np.isnan(df_RBINS['400'])))
-      index = 5
-      _resid_subplot(spec_type,subtitle, index, ylab,percent_limits, df_RBINS, df_R ,bands)
-    
-      subtitle  = 'CNR: N = ' + str(np.sum(~np.isnan(df_CNR['400'])))
-      index = 6
-      _resid_subplot(spec_type,subtitle, index, ylab,percent_limits, df_CNR, df_R ,bands)
-
-        
-    if spec_type == 'Ed' or  spec_type == 'nLw':
-        subtitle  = 'NOAA: N = ' + str(np.sum(~np.isnan(df_NOAA['400'])))
-        index = 7
-        _resid_subplot(spec_type,subtitle, index, ylab, percent_limits_2, df_NOAA, df_R ,bands)
-        
-    
-    plt.tight_layout()
-    
-    filename  =  path_output +  '/' + spec_type + '_resiudalsplot.png'
-    plt.savefig(filename)
-    
-    return
-
 
 def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
     ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
@@ -795,10 +663,10 @@ def plot_residuals_CP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_
     return
 
 
-def plot_residuals_IP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
-    ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
+def plot_residuals_IP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_PML_CP, df_NASA_CP, df_TARTU_CP, df_HEREON_CP, df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    ''' Combined plot'''  
     
-    # QC filtering 
+    # QC filtering ))
     df_PML = df_PML[Q_mask[Qtype]==1]
     df_NASA = df_NASA[Q_mask[Qtype]==1]
     df_TARTU = df_TARTU[Q_mask[Qtype]==1]

@@ -45,9 +45,20 @@ import matplotlib.dates as mdates
 
 import dataframe_image as dfi
 
+#
+def nearest(items, pivot): 
+    'function to locate nearest values and indicies in list x relative to a pivot (used to locate nearest timestamps)'
+    
+    nearest_value = min(items, key=lambda x: abs(x - pivot)) # finds nearest value    
+    nearest_index= items.index(min(items, key=lambda x: abs(x - pivot))) # finds nearest index
+   
+    return nearest_value, nearest_index
+
 ######################
 # READ FUNCTIONS
 #######################
+
+
 
 # PML read functions
 def read_PML_data(path, bands):
@@ -609,13 +620,7 @@ def read_Aeronet_nLw(path_NLW, Ed_R, bands):
     
 
 # QC functions
-def nearest(items, pivot): 
-    'function to locate nearest values and indicies in list x relative to a pivot (used to locate nearest timestamps)'
-    
-    nearest_value = min(items, key=lambda x: abs(x - pivot)) # finds nearest value    
-    nearest_index= items.index(min(items, key=lambda x: abs(x - pivot))) # finds nearest index
-   
-    return nearest_value, nearest_index
+
 
 
 def QC_mask(path_QC, Ed_R, Ed_PML, Lsky_PML, Rrs_PML, Rrs_std_PML):
@@ -1395,26 +1400,26 @@ if __name__ == '__main__':
     azimuth_plot()
     
     # scatter & results plots    
-    plot_scatter('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Ed_CNR, Ed_NOAA, Q_mask, Q_mask, Qtype = 'QC_AOC_3')   
-    plot_scatter('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Lsky_CNR, Lsky_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_scatter('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Lt_CNR, Lt_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_scatter('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS,  Rrs_CNR, Rrs_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_scatter('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_scatter('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, Q_mask, Qtype = 'QC_AOC_3')  # NOAA as baseline
+    plot_scatter('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Ed_CNR, Ed_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    plot_scatter('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Lsky_CNR, Lsky_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_scatter('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Lt_CNR, Lt_NOAA, Q_mask, bands, path_output, Qtype = 'QC_AOC_3') 
+    plot_scatter('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS,  Rrs_CNR, Rrs_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_scatter('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_scatter('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  # NOAA as baseline
     
-    plot_residuals('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Ed_CNR, Ed_NOAA, Q_mask, Qtype = 'QC_AOC_3')    
-    plot_residuals('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Lsky_CNR, Lsky_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_residuals('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Lt_CNR, Lt_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_residuals('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, Rrs_CNR, Rrs_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_residuals('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, Q_mask, Qtype = 'QC_AOC_3') 
-    plot_residuals('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, Q_mask, Qtype = 'QC_AOC_3') # NOAA as baseline
+    plot_residuals('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Ed_CNR, Ed_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')    
+    plot_residuals('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Lsky_CNR, Lsky_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_residuals('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Lt_CNR, Lt_NOAA, bands, path_output,  Q_mask, Qtype = 'QC_AOC_3') 
+    plot_residuals('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, Rrs_CNR, Rrs_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_residuals('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    plot_residuals('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') # NOAA as baseline
     
     # summary tables
-    # Ed_table = tabular_summary('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Q_mask, Qtype = 'QC_AOC_3')    
-    # Lsky_table = tabular_summary('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Q_mask, Qtype = 'QC_AOC_3') 
-    # Lt_table = tabular_summary('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Q_mask, Qtype = 'QC_AOC_3') 
-    # Rrs_table = tabular_summary('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, Q_mask, Qtype = 'QC_AOC_3') 
-    # nLw = tabular_summary('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, Q_mask, Qtype = 'QC_AOC_3') 
+    Ed_table = tabular_summary('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')    
+    Lsky_table = tabular_summary('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    Lt_table = tabular_summary('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    Rrs_table = tabular_summary('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    nLw = tabular_summary('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     
     # Time series for 19/07
     # 3. Time series of spectral maxima
@@ -1563,7 +1568,7 @@ for i in range(len(Ed_PML)):
         time_start_TARTU[i] = datetime.datetime.strptime(Ed_TARTU['time_start'][i],'%Y-%m-%d %H:%M:%S')  
     if Ed_CNR['time_start'][i] != None:
        time_start_CNR[i] = datetime.datetime.strptime(Ed_CNR['time_start'][i],'%Y-%m-%d %H:%M:%S')  
-    #if Ed_HEREON['time_start'][i] != None:
+    # if Ed_HEREON['time_start'][i] != None:
      #  time_start_HEREON[i] = datetime.datetime.strptime(Ed_HEREON['time_start'][i],'%Y-%m-%d %H:%M:%S
  
 

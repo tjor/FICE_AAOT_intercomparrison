@@ -504,6 +504,12 @@ def residuals_combined_nlw(spec_type, df_SEAPRISM, df_NOAA, df_PML, df_NASA, df_
     df_SEAPRISM = df_SEAPRISM[Q_mask[Qtype]==1]
     df_NOAA =  df_NOAA[Q_mask[Qtype]==1]
     
+    df_PML_NOAA_match = df_PML[~np.isnan(df_NOAA['560'])] # filters for NaNs in HP dayta
+    df_NASA_NOAA_match =  df_NASA[~np.isnan(df_NOAA['560'])] 
+    df_NASA2_NOAA_match = df_NASA2[~np.isnan(df_NOAA['560'])] 
+    df_TARTU_NOAA_match = df_TARTU[~np.isnan(df_NOAA['560'])] 
+    df_HEREON_NOAA_match = df_HEREON[~np.isnan(df_NOAA['560'])] 
+    
     #row 1 spectral reiduals plot
     fig= plt.figure(figsize=(17,12))
     
@@ -533,29 +539,29 @@ def residuals_combined_nlw(spec_type, df_SEAPRISM, df_NOAA, df_PML, df_NASA, df_
     index = 5
     _resid_subplot_nLw(spec_type, subtitle,'E.', index, ylab, percent_limits, df_NASA2, df_SEAPRISM, bands)
     
-    percent_limits  = 30
+    percent_limits  = 15
     xlab = 'Wavelength [nm]'
     ylab = '100($X_{IP}$ - $X_{R}$)/$X_{R}$: HyperPro II [%]'
 
     fig.supxlabel(xlab)
     
-    subtitle  = ''
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_NOAA_match['560'])))
     index = 6
     _resid_subplot_nLw(spec_type, subtitle, 'F.', index, ylab, percent_limits, df_PML, df_NOAA, bands)
   
-    subtitle  = ''
+    subtitle  =  'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_NOAA_match['560'])))
     index = 7
     _resid_subplot_nLw(spec_type,subtitle, 'G.', index, ylab, percent_limits, df_TARTU, df_NOAA, bands)
 
-    subtitle  = ''
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_NOAA_match['560'])))
     index = 8
     _resid_subplot_nLw(spec_type,subtitle, 'H.', index, ylab,percent_limits, df_HEREON, df_NOAA, bands)
 
-    subtitle  = ''
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_NOAA_match['560'])))
     index = 9
     _resid_subplot_nLw(spec_type, subtitle,'I.', index, ylab, percent_limits, df_NASA, df_NOAA, bands)
     
-    subtitle  = ''
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_NOAA_match['560'])))
     index = 10
     _resid_subplot_nLw(spec_type, subtitle,'J.', index, ylab, percent_limits, df_NASA2, df_NOAA, bands)
 
@@ -564,7 +570,7 @@ def residuals_combined_nlw(spec_type, df_SEAPRISM, df_NOAA, df_PML, df_NASA, df_
     plt.tight_layout(pad=1.2)
     
     
-    filename  =  path_output +  '/' + spec_type + '_summary.png' 
+    filename  =  path_output +  '/' + spec_type + '_summaryzoom.png' 
     plt.savefig(filename, dpi=300)
     
 
@@ -601,7 +607,9 @@ def SB_VS_HP(spec_type, df_SEAPRISM, df_NOAA, bands, path_output, Q_mask, Qtype 
             c_index = int(round(float(bands[i]))) - 400
             plt.scatter(df_SEAPRISM[str(bands[i])], df_NOAA[str(bands[i])], color=colors[c_index], facecolors='none',label=str(bands_round[i]) + ' nm')  
 
+
     plt.gca().set_aspect('equal')
+    plt.title('N = ' + str(np.sum(~np.isnan(df_NOAA['560']))))    
     plt.legend(loc=4)
     xlab = '$L_{wn}$: SeaPrism [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
     ylab = '$L_{wn}$: HyperPro [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
@@ -610,7 +618,6 @@ def SB_VS_HP(spec_type, df_SEAPRISM, df_NOAA, bands, path_output, Q_mask, Qtype 
       
     ax=plt.gca()
     plt.text(.05, .95,  'A.', ha='left', va='top', transform=ax.transAxes,fontsize=20)  
-    
     
     
     percent_limits  = 30

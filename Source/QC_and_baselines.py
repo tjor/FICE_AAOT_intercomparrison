@@ -547,6 +547,25 @@ def filter_by_azimuth(df_PML, df_NASA, df_RBINS, df_CNR, tol=1):
     return df_NASA, df_RBINS, df_CNR
 
 
+def filter_by_azimuth_noCNR(df_PML, df_NASA, df_RBINS,  tol=1):
+    '''function to filter NASA, RBINS, CNR via azimuth'''   
+    
+    delta_phi_NASA = abs(df_NASA['azimuth']) - abs(df_PML['azimuth'])
+    delta_phi_RBINS = abs(df_RBINS['azimuth']) - abs(df_PML['azimuth'])
+    
+   
+    # delta_phi_NASA = df_NASA['azimuth'] - df_PML['azimuth']
+    # delta_phi_RBINS = df_RBINS['azimuth'] - df_PML['azimuth']
+    
+    for i in range(78):
+       if abs(delta_phi_NASA[i]) > tol:
+         df_NASA.iloc[i] = np.nan
+       if abs(delta_phi_RBINS[i]) > tol:
+         df_RBINS.iloc[i] = np.nan
+
+    return df_NASA, df_RBINS,
+
+
 def filter_by_azimuth_CP(df_PML, df_NASA, df_NASA_CP, tol=1):
     '''function to filter just NASA by azimuth - used for CP
     IP data frame is used for azimuth'''   
@@ -568,30 +587,32 @@ def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
     plt.rc('font', size=18) 
   #  plt.suptitle('Relative azimuth for NASA, RBINS, CNR, compared with fixed systems')
   
-    plt.title('NASA')
+
     plt.subplot(2,2,1)
+    plt.title('NASA')
     plt.plot(Ed_PML.index, abs(Ed_PML['azimuth']), label= 'PML, TARTU, HEREON',color='orange',linewidth = 3)
     plt.plot(Ed_NASA.index, abs(Ed_NASA['azimuth']), label= 'NASA', linestyle='dashed',color='blue',linewidth = 3)
     plt.xlabel('Station number')
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
-    plt.title('RBINS')
+
     plt.subplot(2,2,2)
+    plt.title('RBINS')
     plt.plot(Ed_PML.index, abs(Ed_PML['azimuth']), label= 'PML, TARTU, HEREON',color='orange',linewidth = 3)
     plt.plot(Ed_RBINS.index, abs(Ed_RBINS['azimuth']), label= 'RBINS', linestyle='dashed', color='black',linewidth =3)
     plt.xlabel('Station number')
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
     
-    plt.title('CNR')
     plt.subplot(2,2,3)
+    plt.title('CNR')
     plt.plot(Ed_PML.index, abs(Ed_PML['azimuth']), label= 'PML, TARTU, HEREON',color='orange',linewidth = 3)
     plt.plot(Ed_CNR.index, abs(Ed_CNR['azimuth']), label= 'CNR', linestyle='dashed',color='green',linewidth = 3)
     plt.xlabel('Station number')
     plt.ylabel('|$\phi$| (deg)')
     plt.legend()
     
-    plt.tight_layout(pad=2.4)
+    plt.tight_layout(pad=3)
     
     #plt.figure()
     #plt.title('Relative azimuth')
