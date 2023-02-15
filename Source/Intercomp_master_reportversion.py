@@ -63,6 +63,7 @@ if __name__ == '__main__':
     path_TARTU = dir_data  + '/UniTartu/averages.csv'  
     path_HEREON = dir_data + '/HEREON/FRM4SOC2_FICE22_HEREON_DATA_OLCI'
     path_HEREON_nLw = dir_data + '/HEREON/FRM4SOC2_HEREON_Normalization_revised/FRM4SOC2_FICE22_HEREON_DATA_Lwn_mean_SRF_OLCI.csv'
+    path_HEREON_RAFT = dir_data + '/HEREON_RAFT/FRM4SOC2_FICE22_HEREON_RAFT_DATA_OLCI/'
     path_NOAA = dir_data  + '/NOAA/NOAA_Hyperpro_sheet2.csv'
     
     # path_CNR = dir_data + '/CNR/FRM4SOC_2_FICE_22_AAOT_CNR_HYPSTAR_w-rel-az_ALLDATA.csv'
@@ -86,10 +87,12 @@ if __name__ == '__main__':
     Ed_NOAA, Lsky_NOAA, Lt_NOAA, Rrs_NOAA, nLw_NOAA  = rd_IP.read_NOAA_data(path_NOAA, bands, Ed_PML) # PML timestamps used to reference staion no.
     Ed_CNR, Lsky_CNR, Lt_CNR, Rrs_CNR, Rrs_std_CNR, nLw_CNR = rd_IP.read_CNR_data(path_CNR, bands)
    
+    
     nLw_TARTU, scale = rd_IP.nLw_usingPMLBRDF(nLw_PML, Rrs_PML, Rrs_TARTU,'TARTU', bands) # using PML f/q method and re-scaling
     #nLw_HEREON, scale = rd_IP.nLw_usingPMLBRDF(nLw_PML, Rrs_PML, Rrs_HEREON,'HEREON', bands) # using PML f/q method and re-scaling
     nLw_HEREON = pd.read_csv(path_HEREON_nLw,header=None,skiprows =1,usecols=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],delim_whitespace=True) # revised IP submission by HEREON
     nLw_HEREON.columns = bands
+      
     
     # Read Community Procsssed data
     Ed_PML_CP, Ed_unc_PML_CP, Lsky_PML_CP , Lsky_unc_PML_CP, Lt_PML_CP, Lt_unc_PML_CP,  Rrs_PML_CP, Rrs_unc_PML_CP = rd_CP.read_CP_data('PML', Ed_PML, bands) # Ed dataframe used for timestamp
@@ -114,6 +117,16 @@ if __name__ == '__main__':
     Lsky_NASA, Lsky_RBINS = QC.filter_by_azimuth_noCNR(Lsky_PML, Lsky_NASA, Lsky_RBINS)
     Lt_NASA, Lt_RBINS = QC.filter_by_azimuth_noCNR(Lt_PML, Lt_NASA, Lt_RBINS)
     Rrs_NASA, Rrs_RBINS = QC.filter_by_azimuth_noCNR(Rrs_PML, Rrs_NASA, Rrs_RBINS) 
+    
+    # manual removal of final cast of day on 15, 19, 20th for NOAA HP
+    Ed_NOAA.iloc[28,:] = np.nan
+    Ed_NOAA.iloc[53,:] = np.nan
+    Ed_NOAA.iloc[69,:] = np.nan
+
+    #
+    nLw_NOAA.iloc[28,:] = np.nan
+    nLw_NOAA.iloc[53,:] = np.nan
+    nLw_NOAA.iloc[69,:] = np.nan
 
     
     # Reference baselines (must be done post azimuth filtering)
@@ -122,7 +135,9 @@ if __name__ == '__main__':
     Lt_R = QC.baseline_average_V2('Lt', Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON)
     Rrs_R = QC.baseline_average_V2('Rrs', Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON)
     # Rrs_std_R = QC.baseline_average_V2('Rrs', Rrs_std_PML, Rrs_std_NASA, Rrs_std_TARTU, Rrs_std_HEREON)  
+    
     nLw_SEAPRISM = rd_IP.read_Aeronet_nLw(path_NLW, Ed_R, bands)    
+    nLw_RAFT =  rd_IP.read_HEREON_RAFT_data(path_HEREON_RAFT, bands)    
     
     # Reference baselines -CP (must be done post azimuth filtering)
     Ed_R_CP = QC.baseline_average_V2_CP('Ed',  Ed_PML, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP) # baseline V2 is 4-way mean of PML, NASA, HEREON, TARTU
@@ -147,7 +162,7 @@ if __name__ == '__main__':
     #rp.plot_scatter('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     #rp.plot_scatter('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, nLw_CNR, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  # NOAA as baseline
     
-    #rp.plot_residuals('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_RBINS, Ed_CNR, Ed_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')    
+    rp.plot_residuals('Ed', Ed_R, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON,Ed_RBINS, Ed_CNR, Ed_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
     #rp.plot_residuals('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_RBINS, Lsky_CNR, Lsky_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     #rp.plot_residuals('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_RBINS, Lt_CNR, Lt_NOAA, bands, path_output,  Q_mask, Qtype = 'QC_AOC_3')  
     #rp.plot_residuals('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, Rrs_CNR, Rrs_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
@@ -161,17 +176,17 @@ if __name__ == '__main__':
     # rp.plot_scatter_CP('Ed', Ed_R_CP, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     # rp.plot_scatter_CP('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     # rp.plot_scatter_CP('Lt', Lt_R, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
- #   rp.plot_scatter_CP('Rrs', Rrs_R, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+    #   rp.plot_scatter_CP('Rrs', Rrs_R, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     
     # rp.plot_residuals_CP('Ed', Ed_R_CP, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP, Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     # rp.plot_residuals_CP('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')                   
     # rp.plot_residuals_CP('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
-   # rp.plot_residuals_CP('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    # rp.plot_residuals_CP('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
      
     #rp.plot_unc_CP('Ed', Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
     #rp.plot_unc_CP('Lsky', Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
     #rp.plot_unc_CP('Lt', Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
-   # rp.plot_unc_CP('Rrs', Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
+    # rp.plot_unc_CP('Rrs', Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
     
     
     ##########################################################################
@@ -181,8 +196,8 @@ if __name__ == '__main__':
     # rp.plot_scatter_IP('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     # rp.plot_scatter_IP('Lt', Lt_R, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     #  rp.plot_scatter_IP('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
-  #  rp.plot_scatter_IP('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') # SEABIRD
-   # rp.plot_scatter_IP('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') # NOAA
+   #  rp.plot_scatter_IP('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') # SEABIRD
+    # rp.plot_scatter_IP('nLw', nLw_NOAA, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') # NOAA
     
     # rp.plot_residuals_IP('Ed', Ed_R, Ed_PML_CP, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     # rp.plot_residuals_IP('Lsky', Lsky_R, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')                   
@@ -217,9 +232,12 @@ if __name__ == '__main__':
     # rp.residuals_combined('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     # rp.residuals_combined('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
     # rp.residuals_combined('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
-    #
+    
     rp.residuals_combined_nlw('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    rp.residuals_combined_nlw_v2('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
     rp.SB_VS_HP('nLw', nLw_SEAPRISM, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    rp.SB_VS_RAFT('nLw', nLw_SEAPRISM, nLw_RAFT, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    
 
     ############################################################################
     # Summary tables - IP data
@@ -230,20 +248,20 @@ if __name__ == '__main__':
     # Rrs_table = rp.tabular_summary('Rrs', Rrs_R, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
     # nLw = rp.tabular_summary('nLw', nLw_R, nLw_PML, nLw_NASA, nLw_TARTU, nLw_HEREON, nLw_RBINS, bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
   
-    filename  =  path_output +  '/'  + 'Ed_stations_NOAA.csv'
-    Ed_NOAA.to_csv(filename, na_rep ='NaN', index = False)
+    #filename  =  path_output +  '/'  + 'Ed_stations_NOAA.csv'
+    #Ed_NOAA.to_csv(filename, na_rep ='NaN', index = False)
     
-    filename  =  path_output +  '/'  + 'Ed_stations_PML.csv'
-    Ed_PML.to_csv(filename, na_rep ='NaN', index = False)
+    #filename  =  path_output +  '/'  + 'Ed_stations_PML.csv'
+    #Ed_PML.to_csv(filename, na_rep ='NaN', index = False)
     
-    filename  =  path_output +  '/'  + 'Ed_stations_Reference.csv'
-    Ed_R.to_csv(filename, na_rep ='NaN', index = False)
+    #filename  =  path_output +  '/'  + 'Ed_stations_Reference.csv'
+    #Ed_R.to_csv(filename, na_rep ='NaN', index = False)
     
-    filename  =  path_output +  '/'  + 'nLw_stations_NOAA.csv'
-    nLw_NOAA.to_csv(filename, na_rep ='NaN', index = False)
+    # filename  =  path_output +  '/'  + 'nLw_stations_NOAA.csv'
+    # nLw_NOAA.to_csv(filename, na_rep ='NaN', index = False)
     
-    filename  =  path_output +  '/'  + 'nLw_stations_SEAPRISM.csv'
-    nLw_SEAPRISM.to_csv(filename, na_rep ='NaN', index = False)
+    #filename  =  path_output +  '/'  + 'nLw_stations_SEAPRISM.csv'
+    #nLw_SEAPRISM.to_csv(filename, na_rep ='NaN', index = False)
 
-    filename  =  path_output +  '/'  + 'QC_mask.csv'
-    Q_mask.to_csv(filename, na_rep ='NaN', index = False)
+    #filename  =  path_output +  '/'  + 'QC_mask.csv'
+    #Q_mask.to_csv(filename, na_rep ='NaN', index = False)

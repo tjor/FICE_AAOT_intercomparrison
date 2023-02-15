@@ -737,7 +737,7 @@ def plot_residuals_IP(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, df_
     return
 
 
-def plot_residuals_IP_nounc(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+def _IP_nounc(spec_type, df_R, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
     ''' Funtion to plot spectral dependence of % residuals following Tilstone 2020'''  
     
     # QC filtering 

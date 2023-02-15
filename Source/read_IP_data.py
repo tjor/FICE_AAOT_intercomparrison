@@ -293,6 +293,27 @@ def read_HEREON_spec(path, S, bands):
     
     return df
 
+
+def read_HEREON_RAFT_data(path, bands):
+
+    files = sorted(os.listdir(path))
+    data = np.nan*np.ones([78,18]) 
+    station_index = [9, 10, 11, 18, 25, 26, 27, 28, 29 , 51, 52, 53, 54, 55, 62, 63, 65, 66] # cross-reference with xls metadata spreadsheet
+       
+    print()
+    for i in range(len(files)):
+        text_i = np.loadtxt(path + files[i], skiprows = 1)
+        data[station_index[i] ,:] = text_i[1, 1:] 
+            
+    df = pd.DataFrame() 
+    for i in range(len(bands)-1):
+            df[str(bands[i])] = data[:,i] 
+
+    return df
+
+
+
+
 # NOAA read functions 
 def read_NOAA_data(path, bands, Ed_PML):
     'Wrappers to read spectra in dataframe format - Ed_PML used for reference time'
