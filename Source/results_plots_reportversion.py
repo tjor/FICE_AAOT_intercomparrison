@@ -450,39 +450,40 @@ def residuals_combined(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, d
     if spec_type == 'Ed':
         percent_limits = 8
     if spec_type == 'Lsky':
-         percent_limits = 10
+         percent_limits = 8
     if spec_type == 'Lt':
-         percent_limits = 10
+         percent_limits = 8
     if spec_type == 'Rrs':
-        percent_limits = 15
+        percent_limits = 20
     if spec_type == 'nLw':
-        percent_limits = 16
+        percent_limits = 15
         
-    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML['400'])))
+        
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
     index = 1
-    _resid_subplot_CP(spec_type, subtitle, 'A.', index, ylab, percent_limits, df_PML, unc_med_PML, df_R_CP, bands)
+    _resid_subplot_CP(spec_type, subtitle, 'A.', index, ylab, percent_limits, df_PML_CP, unc_med_PML, df_R_CP, bands)
   
-    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU['400'])))
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
     index = 2
-    _resid_subplot_CP(spec_type,subtitle, 'B.', index, ylab, percent_limits, df_TARTU, unc_med_TARTU, df_R_CP, bands)
+    _resid_subplot_CP(spec_type,subtitle, 'B.', index, ylab, percent_limits, df_TARTU_CP, unc_med_TARTU, df_R_CP, bands)
 
-    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON['400'])))
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
     index = 3
-    _resid_subplot_CP(spec_type,subtitle, 'C.', index, ylab,percent_limits, df_HEREON, unc_med_HEREON, df_R_CP, bands)
+    _resid_subplot_CP(spec_type,subtitle, 'C.', index, ylab,percent_limits, df_HEREON_CP, unc_med_HEREON, df_R_CP, bands)
 
-    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA['400'])))
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
     index = 4
-    _resid_subplot_CP(spec_type, subtitle,'D.', index, ylab, percent_limits, df_NASA, unc_med_NASA, df_R_CP, bands)
+    _resid_subplot_CP(spec_type, subtitle,'D.', index, ylab, percent_limits, df_NASA_CP, unc_med_NASA, df_R_CP, bands)
     
  
     if spec_type == 'Ed':
-        percent_limits = 15
+        percent_limits = 6
     if spec_type == 'Lsky':
-         percent_limits = 15
+         percent_limits = 6
     if spec_type == 'Lt':
-         percent_limits = 25
+         percent_limits = 6
     if spec_type == 'Rrs':
-         percent_limits = 30
+         percent_limits = 20
 
     xlab = 'Wavelength [nm]'
     fig.supxlabel(xlab)
@@ -513,7 +514,7 @@ def residuals_combined(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, d
     if spec_type == 'Lt':
         percent_limits = 10
     if spec_type == 'Rrs':
-        percent_limits = 15
+        percent_limits = 20
     if spec_type == 'nLw':
         percent_limits = 40
 
@@ -853,7 +854,7 @@ def SB_VS_RAFT(spec_type, df_SEAPRISM, df_RAFT, bands, path_output, Q_mask, Qtyp
     plt.title('N = ' + str(np.sum(~np.isnan(df_RAFT['560']))))    
     plt.legend(loc=4)
     xlab = '$L_{wn}$: SeaPrism [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
-    ylab = '$L_{wn}$: HereonRaft [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
+    ylab = '$L_{wn}$: RAMSES-Floating [mW m$^{-2}$ nm$^{-1}$ sr$^{-1}$]'
     plt.xlabel(xlab)
     plt.ylabel(ylab)
       
@@ -863,7 +864,7 @@ def SB_VS_RAFT(spec_type, df_SEAPRISM, df_RAFT, bands, path_output, Q_mask, Qtyp
     
     percent_limits  = 30
     xlab = 'Wavelength [nm]'
-    ylab = '100($X_{HereonRaft}$ - $X_{SeaPrism}$)/$X_{SeaPrism}$  [%]'    
+    ylab = '100($X_{RAMES-Floating}$ - $X_{SeaPrism}$)/$X_{SeaPrism}$  [%]'    
     index = 2
     _resid_subplot_nLw_SP_HP(spec_type, '',  'B.', index, ylab, percent_limits, df_RAFT, df_SEAPRISM, bands)
     plt.tight_layout(pad=1.2)
@@ -873,7 +874,6 @@ def SB_VS_RAFT(spec_type, df_SEAPRISM, df_RAFT, bands, path_output, Q_mask, Qtyp
     plt.savefig(filename, dpi=300)
     
     return
-
 
 
 

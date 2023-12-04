@@ -329,6 +329,21 @@ def read_NOAA_data(path, bands, Ed_PML):
 
     return Ed, Lsky, Lt, Rrs, nLw
 
+def read_NOAA_data_V2(path, bands, Ed_PML):
+    'Wrappers to read spectra in dataframe format - Ed_PML used for reference time'
+    
+    Ed = read_NOAA_spec_V2(path, 'Es_average', bands) 
+    Lsky = read_NOAA_spec_V2(path, 'Lsky_average', bands) 
+    Lt =  read_NOAA_spec_V2(path, 'Lt_average', bands) 
+    Rrs =  read_NOAA_spec_V2(path, 'Rrs_average', bands) 
+    nLw = read_NOAA_spec_V2(path, 'nlw_average', bands)
+
+    Ed = time_match_NOAA(Ed, Ed_PML, bands)
+    nLw = time_match_NOAA(nLw, Ed_PML, bands)
+
+    return Ed, Lsky, Lt, Rrs, nLw
+
+
 
 def read_NOAA_spec(path, S ,bands): 
     'Returns dataframe for spectral type S, OLCI bands as columns, indexed by station'
@@ -345,7 +360,6 @@ def read_NOAA_spec(path, S ,bands):
             i = 0
             for row in csv_reader:
                 if(row[0]) == S: 
-                    # print(row[6:22])
                     timestamp_i = datetime.datetime.strptime(row[3][0:19], '%Y-%m-%dT%H:%M:%S')
                     time_start[i] = str(timestamp_i)
                     data[i,:] = row[6:22]
@@ -372,6 +386,66 @@ def read_NOAA_spec(path, S ,bands):
                     timestamp_i = datetime.datetime.strptime(row[3][0:19], '%Y-%m-%dT%H:%M:%S')
                     time_start[i] = str(timestamp_i)
                     data[i, :] = row[6:14]
+                    i = i +1
+                
+            # convert to df format - 
+            df = pd.DataFrame() 
+            df['time_start'] = time_start
+            
+            for i in range(8): # considers bands < 800 nm              
+                df[str(bands[i])] = 10*data[:,i] 
+                
+        else:
+            df = pd.DataFrame() 
+            
+    return df
+
+
+
+def read_NOAA_spec_V2(path, S ,bands): 
+    'Returns dataframe for spectral type S, OLCI bands as columns, indexed by station'
+    
+    with open(path, 'r') as read_obj:
+       
+        # fill up data matrix  - case ed
+        if  S == 'Es_average':
+                
+            csv_reader = reader(read_obj)  
+            data = np.nan*np.ones([78,16]) 
+            time_start = np.empty(78, dtype=object)
+            # station = np.arange(0,78)
+            i = 0
+            for row in csv_reader:
+                if(row[0]) == S: 
+                    print(row[5][0:19])
+                    timestamp_i = datetime.datetime.strptime(row[5][0:19], '%Y-%m-%dT%H:%M:%S')
+                    time_start[i] = str(timestamp_i)
+                    if row[8] != '':
+                        data[i,:] = row[8:24]
+                    i = i +1
+                
+            # convert to df format - 
+            df = pd.DataFrame() 
+            df['time_start'] = time_start
+            
+            for i in range(len(bands) - 3): # considers bands < 800 nm              
+                df[str(bands[i])] = 10*data[:,i] 
+           
+       # fill up data matrix - case nLw or Lw
+        elif S == 'nlw_average' or S == 'lw_average':
+                        
+            csv_reader = reader(read_obj)  
+            data = np.nan*np.ones([78,8]) 
+            time_start = np.empty(78, dtype=object)
+            # station = np.arange(0,78)
+            i = 0
+            for row in csv_reader:
+                if(row[0]) == S: 
+                    print(row[6:14])
+                    timestamp_i = datetime.datetime.strptime(row[5][0:19], '%Y-%m-%dT%H:%M:%S')
+                    time_start[i] = str(timestamp_i)
+                    if row[8] != '':
+                        data[i,:] = row[8:16]
                     i = i +1
                 
             # convert to df format - 

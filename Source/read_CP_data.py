@@ -59,34 +59,37 @@ def read_hyperspectral(institute, var):
         ref_name = "Li_mean"
         ref_std = "Li_standard_deviation"
         grp = "RADIANCE"
-        grp_unc = "UNCERTAINTY_BUDGET"
+        # grp_unc = "UNCERTAINTY_BUDGET" # old format is commented-out
         grp_std = "RADIANCE"    
-        var_unc = "LI_unc"
+        # var_unc = "LI_unc"
+        var_unc = "LI_HYPER_unc"
         unit = "mW/sr.m2.nm"
         
     elif "LT" in var:
         ref_name = "Lt_mean"
         ref_std = "Lt_standard_deviation"
         grp = "RADIANCE"
-        grp_unc = "UNCERTAINTY_BUDGET"
+        # grp_unc = "UNCERTAINTY_BUDGET"
         grp_std = "RADIANCE"  
-        var_unc = "LT_unc"
+        # var_unc = "LT_unc"
+        var_unc = "LT_HYPER_unc"
         unit = "mW/sr.m2.nm"
         
     elif "ES" in var:
         ref_name = "Es_mean"
         ref_std = "Es_standard_deviation"
         grp = "IRRADIANCE"
-        grp_unc = "UNCERTAINTY_BUDGET"
+        #  grp_unc = "UNCERTAINTY_BUDGET"
         grp_std = "IRRADIANCE"  
-        var_unc = "ES_unc"
+        #   var_unc = "ES_unc"
+        var_unc = "ES_HYPER_unc"
         unit = "mW/m2.nm"
         
     elif "nLw" in var:
         ref_name = "nLw_mean"
         ref_std = "nLw_standard_deviation"
         grp = "REFLECTANCE"
-        grp_unc = "REFLECTANCE"
+        #  grp_unc = "REFLECTANCE"
         grp_std = None
         var_unc = "nLw_HYPER_unc"
         unit = "mW/m2.nm"
@@ -95,21 +98,22 @@ def read_hyperspectral(institute, var):
         ref_name = "reflectance_mean"
         ref_std = "reflectance_standard_deviation"
         grp = "REFLECTANCE"
-        grp_unc = "REFLECTANCE"
+        # grp_unc = "REFLECTANCE"
         var_unc = "Rrs_HYPER_unc"
         grp_std = None
         unit = "1/sr"
     
     # locate hdf files for each institute
-    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/CP_common_processing/"  + institute + '/L2/' # common=proces
-    files = glob.glob(dir_data + "/*.hdf")
+    # dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/CP_common_processing/"  + institute + '/L2/' # common=processor # 2022 results: defunct
     
+    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_11-23/" + institute + '/L2/' # common=processor # 2022 results: defunct
+    files = glob.glob(dir_data + "/*.hdf")
     
     
     # extract no. of timestamps (==stations) and no. of wavelengths
     root = h5py.File(files[0], 'r') # read 1st file to read wavelength
     data = pd.DataFrame(root[grp][var][()])
-    wv = np.array([float(x) for x in data.columns[2:] ])
+    wv = np.array([float(x) for x in data.columns[2:]])
     N_wv = len(wv)
     N_stat = len(files)   
     
@@ -124,21 +128,31 @@ def read_hyperspectral(institute, var):
         
         root = h5py.File(files[i], 'r')
         data = pd.DataFrame(root[grp][var][()]) # spectral data
-        data_unc = pd.DataFrame(root[grp_unc][var_unc][()]) # uncertainty of spectral data 
+       # data_unc = pd.DataFrame(root[grp_unc][var_unc][()]) # uncertainty of spectral data # old format
+        data_unc = pd.DataFrame(root[grp][var_unc][()]) # uncertainty of spectral data 
         time[i] = convert_datetime(data['Datetag'],  data['Timetag2'])
         root.close()
+        
+      #  breakpoint()
     
         # convert unit to align Seabird and trios in the same unit
         if "Rrs" not in var:
             scale_unit = 1e-3/1e-4 
-            cp_data[i,:] = data.iloc[0][2:]
-            cp_unc[i, :] = 100*data_unc.iloc[0][:] # convert to % units
+           # scale_unit = 1
+            cp_data[i,:] =  scale_unit*data.iloc[0][2:]
+            #  cp_unc[i, :] = 100*data_unc.iloc[0][:] # previous format
+           # cp_unc[i, :] = 100*data_unc.iloc[0][2:] # convert to % units
+            cp_unc[i, :] = 100*data_unc.iloc[0][2:]/data.iloc[0][2:] # convert to % units
         else:
             cp_data[i,:] = data.iloc[0][2:] 
-            cp_unc[i,:] = 100*data_unc.iloc[0][2:] # convert to % units
-            
-        if (institute == 'PML' or institute == 'NASA') and "Rrs" not in var:
-            cp_data[i,:] = scale_unit*cp_data[i,:]
+           # cp_unc[i,:] = 100*data_unc.iloc[0][2:] # convert to % units
+            cp_unc[i,:] = 100*data_unc.iloc[0][2:]/data.iloc[0][2:]# convert to % units
+     
+    cp_data[cp_data == np.inf] = np.nan
+    cp_unc[cp_unc == np.inf] =  np.nan   # additional data cleaning step required? (infs to nans)
+    
+        # if (institute == 'PML' or institute == 'NASA') and "Rrs" not in var:
+          #  cp_data[i,:] = scale_unit*cp_data[i,:]
            
     
     #else: # does not include uncertainty (just NASA)
@@ -155,12 +169,12 @@ def read_hyperspectral(institute, var):
     #        root.close()
         
             # convert unit to align Seabird and trios in the same unit
-   #         if "Rrs" not in var:
-   #             scale_unit = 1e-3/1e-4 
+    #         if "Rrs" not in var:
+    #             scale_unit = 1e-3/1e-4 
     #            cp_data[i,:] = scale_unit*data.iloc[0][2:]
     #        else:
-     #           cp_data[i,:] = data.iloc[0][2:]
-              
+    #           cp_data[i,:] = data.iloc[0][2:]
+ 
     return cp_data, cp_unc, time, wv
 
 def unpack_srf(dir_srf):
@@ -224,21 +238,21 @@ def time_match(df_CP, df_IP, bands):
            time_start_IP[i] = datetime.datetime.strptime(df_IP['time_start'][i],'%Y-%m-%d %H:%M:%S')  
 
     # match CP to IP timestamps
-    time_start_CP_matching = np.nan*np.ones(len(df_IP),dtype = object) # mathching timestamps
+    time_start_CP_matching = np.nan*np.ones(len(df_IP), dtype = object)  # mathching timestamps
     spec_data_matching = np.nan*np.ones([len(df_IP),len(df_IP.columns)]) # matching spectra
-    tol = 10*60   # 10 mins buffer     
+    tol = 10*60  # 10 mins buffer     
     for i in range(len(time_start_IP)):
          if time_start_IP[i] != None:
              nearest_time, nearest_index = nearest(time_start_CP, time_start_IP[i])
              delta_t = abs(time_start_IP[i] - nearest_time) 
-             # print(delta_t)
-             # print(nearest_index)
+             # print(delta_t) #
+             # print(nearest_index) #
              if delta_t.total_seconds() < tol:
                  time_start_CP_matching[i] = str(time_start_CP[nearest_index]) 
                  for j in range(len(df_CP.columns)-1):
                      spec_data_matching[i,j] = df_CP[str(bands_CP[j])][nearest_index]
       
-    # re-convert to CP 
+    # re-convert to CP #
     df = pd.DataFrame() 
     df['time_start'] =  time_start_CP_matching
     for j in range(len(df_CP.columns)-1): # considers bands < 800 nm              
@@ -271,10 +285,11 @@ def read_CP_data(institute, Ed_IP, bands):
         institute = 'UT' # UT = TARTU for hdf file ID
     
     # read hyperspectral CP data
+    Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER')
     Ed, Ed_unc, time, wv = read_hyperspectral(institute, 'ES_HYPER')
     Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER')    
     Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER')                                                                      
-    Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER')
+  
     
     # spectral convolution - also applies to uncertainty
     Ed = hyperspec_to_OLCIbands(Ed, time, wv, srf, srf_bands, srf_wv)  
@@ -291,7 +306,7 @@ def read_CP_data(institute, Ed_IP, bands):
     # Timestamp mathcing to IP-processed data
     Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands)
     #if institute != 'NASA':
-    Ed_unc, Lsky_unc, Lt_unc,  Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
+    Ed_unc, Lsky_unc, Lt_unc, Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
           
     return  Ed, Ed_unc, Lsky, Lsky_unc, Lt, Lt_unc, Rrs, Rrs_unc
 

@@ -110,6 +110,7 @@ def baseline_average_V2(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON):
             .mean()
         )
        
+    
        # used to calculate number used in mean - require need 3 or more systems for mean to be defined
       df_N =  pd.concat([df_PML, df_NASA, df_TARTU, df_HEREON])
       N_mean = np.zeros(78)
@@ -127,7 +128,7 @@ def baseline_average_V2(spec_type, df_PML, df_NASA, df_TARTU, df_HEREON):
          
       return df_R
   
-def baseline_average_V2_CP(spec_type, Ed_PML,df_PML, df_NASA, df_TARTU, df_HEREON):
+def baseline_average_V2_CP(spec_type, Ed_PML, df_PML, df_NASA, df_TARTU, df_HEREON):
           'Computes reference baselines - assummes even weighting of each submitted team'''
         
           df_R = ( 
@@ -629,4 +630,4 @@ def azimuth_plot(Ed_PML, Ed_NASA, Ed_RBINS, Ed_CNR, path_output):
 
     return
 
-
+    
