@@ -105,11 +105,11 @@ def read_hyperspectral(institute, var):
     
     # locate hdf files for each institute
     # dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/CP_common_processing/"  + institute + '/L2/' # common=processor # 2022 results: defunct
-    
-    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_11-23/" + institute + '/L2/' # common=processor # 2022 results: defunct
+    #dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_11-23/" + institute + '/L2/' # 
+    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/" + institute + '/L2_no_NIR_Correction/' # common=processor # 2022 results: defunct
     files = glob.glob(dir_data + "/*.hdf")
     
-    
+    print(len(files))
     # extract no. of timestamps (==stations) and no. of wavelengths
     root = h5py.File(files[0], 'r') # read 1st file to read wavelength
     data = pd.DataFrame(root[grp][var][()])
@@ -147,10 +147,13 @@ def read_hyperspectral(institute, var):
             cp_data[i,:] = data.iloc[0][2:] 
            # cp_unc[i,:] = 100*data_unc.iloc[0][2:] # convert to % units
             cp_unc[i,:] = 100*data_unc.iloc[0][2:]/data.iloc[0][2:]# convert to % units
-     
+      
+        
     cp_data[cp_data == np.inf] = np.nan
     cp_unc[cp_unc == np.inf] =  np.nan   # additional data cleaning step required? (infs to nans)
     
+    
+    print(str(cp_data) + '   ' + str(institute)) 
         # if (institute == 'PML' or institute == 'NASA') and "Rrs" not in var:
           #  cp_data[i,:] = scale_unit*cp_data[i,:]
            
@@ -240,13 +243,13 @@ def time_match(df_CP, df_IP, bands):
     # match CP to IP timestamps
     time_start_CP_matching = np.nan*np.ones(len(df_IP), dtype = object)  # mathching timestamps
     spec_data_matching = np.nan*np.ones([len(df_IP),len(df_IP.columns)]) # matching spectra
-    tol = 10*60  # 10 mins buffer     
+    tol = 10*60  #  buffer  - 10 mins originally used a buffer     
     for i in range(len(time_start_IP)):
          if time_start_IP[i] != None:
              nearest_time, nearest_index = nearest(time_start_CP, time_start_IP[i])
              delta_t = abs(time_start_IP[i] - nearest_time) 
              # print(delta_t) #
-             # print(nearest_index) #
+             # print(nearest_index) #         
              if delta_t.total_seconds() < tol:
                  time_start_CP_matching[i] = str(time_start_CP[nearest_index]) 
                  for j in range(len(df_CP.columns)-1):
@@ -303,11 +306,15 @@ def read_CP_data(institute, Ed_IP, bands):
     Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
     Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv) 
     
-    # Timestamp mathcing to IP-processed data
-    Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands)
-    #if institute != 'NASA':
-    Ed_unc, Lsky_unc, Lt_unc, Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
+   # if institute == 'NASA':
+    #    breakpoint()
           
+    # Timestamp mathcing to IP-processed data
+
+    Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands) # Ed_IP used for timestamps
+    Ed_unc, Lsky_unc, Lt_unc, Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
+
+  
     return  Ed, Ed_unc, Lsky, Lsky_unc, Lt, Lt_unc, Rrs, Rrs_unc
 
 

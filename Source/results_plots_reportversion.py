@@ -440,6 +440,7 @@ def residuals_combined(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, d
     df_R_CP = df_R_CP[Q_mask[Qtype]==1]
     
     
+    
     #row 1 spectral reiduals plot
     fig= plt.figure(figsize=(17,14))
     
@@ -454,7 +455,7 @@ def residuals_combined(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, d
     if spec_type == 'Lt':
          percent_limits = 8
     if spec_type == 'Rrs':
-        percent_limits = 20
+        percent_limits = 10
     if spec_type == 'nLw':
         percent_limits = 15
         
