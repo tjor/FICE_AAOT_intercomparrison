@@ -51,7 +51,7 @@ def convert_datetime(date, time):
     return datetime.datetime.strptime(time_str, "%Y%j.0%H%M%S%f.0") 
 
 
-def read_hyperspectral(institute, var, dir_CP):
+def read_hyperspectral(institute, var, dir_CP, class_based):
     '''Reads hyperspectral data from each institute: specify institute (PML, NASA, TARTU, HEREON),
       and var: LI,LT, ES,nLw Rrs'''
       
@@ -102,26 +102,28 @@ def read_hyperspectral(institute, var, dir_CP):
         var_unc = "Rrs_HYPER_unc"
         grp_std = None
         unit = "1/sr"
-    
-    # locate hdf files for each institute
-    # dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/CP_common_processing/"  + institute + '/L2/' # common=processor # 2022 results: defunct
-    #dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_11-23/" + institute + '/L2/' # 
-    dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/" + institute + '/L2_no_NIR_Correction/' # common=processor # 2022 results: defunct
-    
-    # dir_data = "/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/" + institute + '/L2_no_NIR_Correction/' # common=processor # 2022 results: defunct
-    dir_data = dir_CP + institute + '/L2_no_NIR_Correction/'
+
+    if class_based == True:
+        dir_data = dir_CP + institute + '/L2_no_NIR_Correction/' # common=processor # 2022 results: defunct
+    elif class_based == False:
+        #dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' + institute + '/'
+        dir_data = dir_CP + institute + '/L2/'
+    print(dir_data)
+
     files = glob.glob(dir_data + "/*.hdf")
-     
-    files = glob.glob(dir_data + "/*.hdf")
+
+  #  breakpoint()
     
     print(len(files))
     # extract no. of timestamps (==stations) and no. of wavelengths
     root = h5py.File(files[0], 'r') # read 1st file to read wavelength
     data = pd.DataFrame(root[grp][var][()])
+
     wv = np.array([float(x) for x in data.columns[2:]])
     N_wv = len(wv)
     N_stat = len(files)   
     
+   # breakpoint()
     # if institute != 'NASA': # includes uncertainty
     # define empty data matrices
     
@@ -506,7 +508,7 @@ def time_match_allvars(Ed_IP, Ed_CP, Lsky_CP, Lt_CP, Rrs_CP, bands):
     return  Ed_CP_matching,  Lsky_CP_matching,   Lt_CP_matching,   Rrs_CP_matching
 
 
-def read_CP_data(institute, Ed_IP, dir_CP, bands):
+def read_CP_data(institute, Ed_IP, dir_CP, bands,class_based):
     ' Applies time matching to all variables. Ed_IP is used for timestamps'
     ' Function is called once for each institute'
     
@@ -518,10 +520,10 @@ def read_CP_data(institute, Ed_IP, dir_CP, bands):
         institute = 'UT' # UT = TARTU for hdf file ID
     
     # read hyperspectral CP data
-    Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER', dir_CP)
-    Ed, Ed_unc, time, wv = read_hyperspectral(institute, 'ES_HYPER', dir_CP)
-    Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER', dir_CP)    
-    Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP)                                                                      
+    Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER', dir_CP, class_based)
+    Ed, Ed_unc, time, wv = read_hyperspectral(institute, 'ES_HYPER', dir_CP, class_based)
+    Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER', dir_CP, class_based)    
+    Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP, class_based)                                                                      
   
     
     # spectral convolution - also applies to uncertainty
