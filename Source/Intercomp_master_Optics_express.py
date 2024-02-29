@@ -99,7 +99,7 @@ if __name__ == '__main__':
       
     
 
-    # Read Community Procsssed dat - convolved versions of files
+    # Read Community Procsssed data - convolved versions of files
     # Ed_PML_CP, Ed_unc_PML_CP, Lsky_PML_CP, Lsky_unc_PML_CP, Lt_PML_CP, Lt_unc_PML_CP,  Rrs_PML_CP, Rrs_unc_PML_CP = rd_CP.read_CP_data_convolved('PML', Ed_PML,  dir_CP_class, bands) # Ed dataframe used for timestamp
     # Ed_TARTU_CP, Ed_unc_TARTU_CP, Lsky_TARTU_CP, Lsky_unc_TARTU_CP, Lt_TARTU_CP, Lt_unc_TARTU_CP,  Rrs_TARTU_CP, Rrs_unc_TARTU_CP = rd_CP.read_CP_data('TARTU', Ed_TARTU, bands)
     class_based = False
@@ -160,6 +160,8 @@ if __name__ == '__main__':
     Lsky_R = QC.baseline_average_V2('Lsky', Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON) # V1 - is even mixing of seabird/Trios
     Lt_R = QC.baseline_average_V2('Lt', Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON)
     Rrs_R = QC.baseline_average_V2('Rrs', Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON)
+    
+    
     # Rrs_std_R = QC.baseline_average_V2('Rrs', Rrs_std_PML, Rrs_std_NASA, Rrs_std_TARTU, Rrs_std_HEREON)  
     
     nLw_SEAPRISM = rd_IP.read_Aeronet_nLw(path_NLW, Ed_R, bands)    
@@ -170,6 +172,12 @@ if __name__ == '__main__':
     Lsky_R_CP = QC.baseline_average_V2_CP('Lsky', Ed_PML, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP) # Ed_PML used for windspeed
     Lt_R_CP = QC.baseline_average_V2_CP('Lt', Ed_PML, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP)
     Rrs_R_CP = QC.baseline_average_V2_CP('Rrs', Ed_PML, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP)
+    
+    Ed_R_CP_FRM = QC.baseline_average_V2_CP('Ed',  Ed_PML,  Ed_PML_CP_FRM, Ed_NASA_CP_FRM, Ed_TARTU_CP_FRM, Ed_HEREON_CP_FRM)
+    Lsky_R_CP_FRM = QC.baseline_average_V2_CP('Lsky', Lsky_PML, Lsky_PML_CP_FRM, Lsky_NASA_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_HEREON_CP_FRM)
+    Lt_R_CP_FRM = QC.baseline_average_V2_CP('Lt',  Lt_PML,  Lt_PML_CP_FRM, Lt_NASA_CP_FRM, Lt_TARTU_CP_FRM, Lt_HEREON_CP_FRM)
+    Rrs_R_CP_FRM = QC.baseline_average_V2_CP('Rrs', Rrs_PML,  Rrs_PML_CP_FRM, Rrs_NASA_CP_FRM, Rrs_TARTU_CP_FRM, Rrs_HEREON_CP_FRM)
+    
     
     # Quality control (dervies QC mask accomodating both SeaPrism, and Env conditions QC)
     Q_mask = QC.QC_mask(path_QC, Ed_R, Ed_PML, Lsky_PML, Rrs_PML, Rrs_std_PML, path_output) 
@@ -255,54 +263,160 @@ if __name__ == '__main__':
     # these are summmary ` combined' plots for the OE paper draft: Row 1: HCP, Row 2: Uncertanties, Row 3: HCP versus IP
     # #############################################################################
  
-    rp.residuals_combined('Ed', Ed_R_CP, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP, Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON, Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
-    rp.residuals_combined('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
-    rp.residuals_combined('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
-    rp.residuals_combined('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON, Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    #rp.residuals_combined('Ed', Ed_R_CP, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP, 
+    #                     Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON,
+     #                     Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, 
+     #                     bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    
+   # rp.residuals_combined('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, 
+    #                         Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, 
+     #                        Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, 
+      #                       bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+   
+   # rp.residuals_combined('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, 
+     #                        Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, 
+       #                      Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, 
+        #                     bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    
+    
+   # rp.residuals_combined_('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, 
+        #                     Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON,
+           #                  Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, 
+              #               bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
     
    # rp.residuals_combined_nlw('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
   #  rp.residuals_combined_nlw_v2('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, nLw_PML, nLw_NASA, nLw_NASA2, nLw_TARTU, nLw_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
     # rp.SB_VS_HP('nLw', nLw_SEAPRISM, nLw_NOAA, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
     # rp.SB_VS_RAFT('nLw', nLw_SEAPRISM, nLw_RAFT, bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
 
+#    rp.FRM_unc_plot(Ed_unc_PML_CP_FRM, Ed_unc_NASA_CP_FRM, Ed_unc_TARTU_CP_FRM, Ed_unc_HEREON_CP_FRM,
+ #                      Lsky_unc_PML_CP_FRM, Lsky_unc_NASA_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lsky_unc_HEREON_CP_FRM,
+  #                     Lt_unc_PML_CP_FRM, Lt_unc_NASA_CP_FRM, Lt_unc_TARTU_CP_FRM, Lt_unc_HEREON_CP_FRM,
+   #                    Rrs_unc_PML_CP_FRM, Rrs_unc_NASA_CP_FRM, Rrs_unc_TARTU_CP_FRM, Rrs_unc_HEREON_CP_FRM,
+    #                   bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
 
 
-    rp.FRM_unc_plot(Ed_unc_PML_CP_FRM, Ed_unc_NASA_CP_FRM, Ed_unc_TARTU_CP_FRM, Ed_unc_HEREON_CP_FRM,
-                       Lsky_unc_PML_CP_FRM, Lsky_unc_NASA_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lsky_unc_HEREON_CP_FRM,
-                       Lt_unc_PML_CP_FRM, Lt_unc_NASA_CP_FRM, Lt_unc_TARTU_CP_FRM, Lt_unc_HEREON_CP_FRM,
-                       Rrs_unc_PML_CP_FRM, Rrs_unc_NASA_CP_FRM, Rrs_unc_TARTU_CP_FRM, Rrs_unc_HEREON_CP_FRM,
-                       bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
-
-
-    # uncertainty differences
-    diff_Ed_unc_PML = Ed_unc_PML_CP.iloc[:,1:] - Ed_unc_PML_CP_FRM.iloc[:,1:]
-    diff_Ed_unc_NASA = Ed_unc_NASA_CP.iloc[:,1:] - Ed_unc_NASA_CP_FRM.iloc[:,1:]
-    diff_Ed_unc_TARTU = Ed_unc_TARTU_CP.iloc[:,1:] - Ed_unc_TARTU_CP_FRM.iloc[:,1:]
-    diff_Ed_unc_HEREON = Ed_unc_HEREON_CP.iloc[:,1:] - Ed_unc_HEREON_CP_FRM.iloc[:,1:]
+    # uncertainty differences - un-normalized
+    # diff_Ed_unc_PML = Ed_unc_PML_CP.iloc[:,1:] - Ed_unc_PML_CP_FRM.iloc[:,1:]
+    # diff_Ed_unc_NASA = Ed_unc_NASA_CP.iloc[:,1:] - Ed_unc_NASA_CP_FRM.iloc[:,1:]
+    # diff_Ed_unc_TARTU = Ed_unc_TARTU_CP.iloc[:,1:] - Ed_unc_TARTU_CP_FRM.iloc[:,1:]
+    # diff_Ed_unc_HEREON = Ed_unc_HEREON_CP.iloc[:,1:] - Ed_unc_HEREON_CP_FRM.iloc[:,1:]
     
-    diff_Lsky_unc_PML = Lsky_unc_PML_CP.iloc[:,1:] - Lsky_unc_PML_CP_FRM.iloc[:,1:]
-    diff_Lsky_unc_NASA = Lsky_unc_NASA_CP.iloc[:,1:] - Lsky_unc_NASA_CP_FRM.iloc[:,1:]
-    diff_Lsky_unc_TARTU = Lsky_unc_TARTU_CP.iloc[:,1:] - Lsky_unc_TARTU_CP_FRM.iloc[:,1:]
-    diff_Lsky_unc_HEREON = Lsky_unc_HEREON_CP.iloc[:,1:] - Lsky_unc_HEREON_CP_FRM.iloc[:,1:]
+    #  diff_Lsky_unc_PML = Lsky_unc_PML_CP.iloc[:,1:] - Lsky_unc_PML_CP_FRM.iloc[:,1:]
+    # diff_Lsky_unc_NASA = Lsky_unc_NASA_CP.iloc[:,1:] - Lsky_unc_NASA_CP_FRM.iloc[:,1:]
+    # diff_Lsky_unc_TARTU = Lsky_unc_TARTU_CP.iloc[:,1:] - Lsky_unc_TARTU_CP_FRM.iloc[:,1:]
+    # diff_Lsky_unc_HEREON = Lsky_unc_HEREON_CP.iloc[:,1:] - Lsky_unc_HEREON_CP_FRM.iloc[:,1:]
      
-    diff_Lt_unc_PML = Lt_unc_PML_CP.iloc[:,1:] - Lt_unc_PML_CP_FRM.iloc[:,1:]
-    diff_Lt_unc_NASA = Lt_unc_NASA_CP.iloc[:,1:] - Lt_unc_NASA_CP_FRM.iloc[:,1:]
-    diff_Lt_unc_TARTU = Lt_unc_TARTU_CP.iloc[:,1:] - Lt_unc_TARTU_CP_FRM.iloc[:,1:]
-    diff_Lt_unc_HEREON = Lt_unc_HEREON_CP.iloc[:,1:] - Lt_unc_HEREON_CP_FRM.iloc[:,1:]
+    # diff_Lt_unc_PML = Lt_unc_PML_CP.iloc[:,1:] - Lt_unc_PML_CP_FRM.iloc[:,1:]
+    # diff_Lt_unc_NASA = Lt_unc_NASA_CP.iloc[:,1:] - Lt_unc_NASA_CP_FRM.iloc[:,1:]
+    # diff_Lt_unc_TARTU = Lt_unc_TARTU_CP.iloc[:,1:] - Lt_unc_TARTU_CP_FRM.iloc[:,1:]
+    # diff_Lt_unc_HEREON = Lt_unc_HEREON_CP.iloc[:,1:] - Lt_unc_HEREON_CP_FRM.iloc[:,1:]
     
-    diff_Rrs_unc_PML = Rrs_unc_PML_CP.iloc[:,1:] - Rrs_unc_PML_CP_FRM.iloc[:,1:]
-    diff_Rrs_unc_NASA = Rrs_unc_NASA_CP.iloc[:,1:] - Rrs_unc_NASA_CP_FRM.iloc[:,1:]
-    diff_Rrs_unc_TARTU = Rrs_unc_TARTU_CP.iloc[:,1:] - Rrs_unc_TARTU_CP_FRM.iloc[:,1:]
-    diff_Rrs_unc_HEREON = Rrs_unc_HEREON_CP.iloc[:,1:] - Rrs_unc_HEREON_CP_FRM.iloc[:,1:]
+   # diff_Rrs_unc_PML = Rrs_unc_PML_CP.iloc[:,1:] - Rrs_unc_PML_CP_FRM.iloc[:,1:]
+   # diff_Rrs_unc_NASA = Rrs_unc_NASA_CP.iloc[:,1:] - Rrs_unc_NASA_CP_FRM.iloc[:,1:]
+    #diff_Rrs_unc_TARTU = Rrs_unc_TARTU_CP.iloc[:,1:] - Rrs_unc_TARTU_CP_FRM.iloc[:,1:]
+    #diff_Rrs_unc_HEREON = Rrs_unc_HEREON_CP.iloc[:,1:] - Rrs_unc_HEREON_CP_FRM.iloc[:,1:]
 
 
 
-    rp.FRM_uncdiff_plot(diff_Ed_unc_PML, diff_Ed_unc_NASA, diff_Ed_unc_TARTU, diff_Ed_unc_HEREON,  
-                    diff_Lsky_unc_PML, diff_Lsky_unc_NASA, diff_Lsky_unc_TARTU, diff_Lsky_unc_HEREON, 
-                    diff_Lt_unc_PML, diff_Lt_unc_NASA, diff_Lt_unc_TARTU, diff_Lt_unc_HEREON, 
-                    diff_Rrs_unc_PML, diff_Rrs_unc_NASA, diff_Rrs_unc_TARTU, diff_Rrs_unc_HEREON, 
-                       bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    #  rp.FRM_uncdiff_plot(diff_Ed_unc_PML, diff_Ed_unc_NASA, diff_Ed_unc_TARTU, diff_Ed_unc_HEREON,  
+    #                  diff_Lsky_unc_PML, diff_Lsky_unc_NASA, diff_Lsky_unc_TARTU, diff_Lsky_unc_HEREON, 
+    #                 diff_Lt_unc_PML, diff_Lt_unc_NASA, diff_Lt_unc_TARTU, diff_Lt_unc_HEREON, 
+    #                diff_Rrs_unc_PML, diff_Rrs_unc_NASA, diff_Rrs_unc_TARTU, diff_Rrs_unc_HEREON, 
+           
+                    
+    #     bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
 
+    diff_Ed_unc_PML = 200*(Ed_unc_PML_CP.iloc[:,1:] - Ed_unc_PML_CP_FRM.iloc[:,1:])/(Ed_unc_PML_CP.iloc[:,1:] + Ed_unc_PML_CP_FRM.iloc[:,1:])
+    diff_Ed_unc_NASA = 200*(Ed_unc_NASA_CP.iloc[:,1:] - Ed_unc_NASA_CP_FRM.iloc[:,1:])/(Ed_unc_NASA_CP.iloc[:,1:] + Ed_unc_NASA_CP_FRM.iloc[:,1:])
+    diff_Ed_unc_TARTU = 200*(Ed_unc_TARTU_CP.iloc[:,1:] - Ed_unc_TARTU_CP_FRM.iloc[:,1:])/(Ed_unc_TARTU_CP.iloc[:,1:] + Ed_unc_TARTU_CP_FRM.iloc[:,1:])
+    diff_Ed_unc_HEREON = 200*(Ed_unc_HEREON_CP.iloc[:,1:] - Ed_unc_HEREON_CP_FRM.iloc[:,1:])/(Ed_unc_HEREON_CP.iloc[:,1:] + Ed_unc_HEREON_CP_FRM.iloc[:,1:])
+    
+    diff_Lsky_unc_PML = 200*(Lsky_unc_PML_CP.iloc[:,1:] - Lsky_unc_PML_CP_FRM.iloc[:,1:])/(Lsky_unc_PML_CP.iloc[:,1:] + Lsky_unc_PML_CP_FRM.iloc[:,1:])
+    diff_Lsky_unc_NASA = 200*(Lsky_unc_NASA_CP.iloc[:,1:] - Lsky_unc_NASA_CP_FRM.iloc[:,1:])/(Lsky_unc_NASA_CP.iloc[:,1:] + Lsky_unc_NASA_CP_FRM.iloc[:,1:])
+    diff_Lsky_unc_TARTU = 200*(Lsky_unc_TARTU_CP.iloc[:,1:] - Lsky_unc_TARTU_CP_FRM.iloc[:,1:])/(Lsky_unc_TARTU_CP.iloc[:,1:] + Lsky_unc_TARTU_CP_FRM.iloc[:,1:])
+    diff_Lsky_unc_HEREON = 200*(Lsky_unc_HEREON_CP.iloc[:,1:] - Lsky_unc_HEREON_CP_FRM.iloc[:,1:])/(Lsky_unc_HEREON_CP.iloc[:,1:] + Lsky_unc_HEREON_CP_FRM.iloc[:,1:])
+     
+    diff_Lt_unc_PML = 200*(Lt_unc_PML_CP.iloc[:,1:] - Lt_unc_PML_CP_FRM.iloc[:,1:])/(Lt_unc_PML_CP.iloc[:,1:] + Lt_unc_PML_CP_FRM.iloc[:,1:])
+    diff_Lt_unc_NASA = 200*(Lt_unc_NASA_CP.iloc[:,1:] - Lt_unc_NASA_CP_FRM.iloc[:,1:])/(Lt_unc_NASA_CP.iloc[:,1:] + Lt_unc_NASA_CP_FRM.iloc[:,1:])
+    diff_Lt_unc_TARTU = 200*(Lt_unc_TARTU_CP.iloc[:,1:] - Lt_unc_TARTU_CP_FRM.iloc[:,1:])/(Lt_unc_TARTU_CP.iloc[:,1:] + Lt_unc_TARTU_CP_FRM.iloc[:,1:])
+    diff_Lt_unc_HEREON = 200*(Lt_unc_HEREON_CP.iloc[:,1:] - Lt_unc_HEREON_CP_FRM.iloc[:,1:])/(Lt_unc_HEREON_CP.iloc[:,1:] + Lt_unc_HEREON_CP_FRM.iloc[:,1:])
+    
+    diff_Rrs_unc_PML = 200*(Rrs_unc_PML_CP.iloc[:,1:] - Rrs_unc_PML_CP_FRM.iloc[:,1:])/(Rrs_unc_PML_CP.iloc[:,1:] + Rrs_unc_PML_CP_FRM.iloc[:,1:])
+    diff_Rrs_unc_NASA = 200*(Rrs_unc_NASA_CP.iloc[:,1:] - Rrs_unc_NASA_CP_FRM.iloc[:,1:])/(Rrs_unc_NASA_CP.iloc[:,1:] + Rrs_unc_NASA_CP_FRM.iloc[:,1:])
+    diff_Rrs_unc_TARTU = 200*(Rrs_unc_TARTU_CP.iloc[:,1:] - Rrs_unc_TARTU_CP_FRM.iloc[:,1:])/(Rrs_unc_TARTU_CP.iloc[:,1:] + Rrs_unc_TARTU_CP_FRM.iloc[:,1:])
+    diff_Rrs_unc_HEREON = 200*(Rrs_unc_HEREON_CP.iloc[:,1:] - Rrs_unc_HEREON_CP_FRM.iloc[:,1:])/(Rrs_unc_HEREON_CP.iloc[:,1:] + Rrs_unc_HEREON_CP_FRM.iloc[:,1:])
+
+
+   # rp.FRM_uncdiffV2_plot(diff_Ed_unc_PML, diff_Ed_unc_NASA, diff_Ed_unc_TARTU, diff_Ed_unc_HEREON,  
+   #                 diff_Lsky_unc_PML, diff_Lsky_unc_NASA, diff_Lsky_unc_TARTU, diff_Lsky_unc_HEREON, 
+    #                diff_Lt_unc_PML, diff_Lt_unc_NASA, diff_Lt_unc_TARTU, diff_Lt_unc_HEREON, 
+    #                diff_Rrs_unc_PML, diff_Rrs_unc_NASA, diff_Rrs_unc_TARTU, diff_Rrs_unc_HEREON, 
+     #                  bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+
+
+    ##########################################################################
+    # these are summmary ` combined' plots for the OE paper draft: Row 1: HCP, Row 2:  Class Uncertanties, Row 3: HCP versus IP
+    # #############################################################################
+ 
+    rp.residuals_combined_V2('Ed', Ed_R_CP_FRM, Ed_PML_CP_FRM, Ed_NASA_CP_FRM, Ed_TARTU_CP_FRM, Ed_HEREON_CP_FRM, 
+                          Ed_PML, Ed_NASA, Ed_TARTU, Ed_HEREON,
+                          Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, 
+                          Ed_unc_PML_CP_FRM, Ed_unc_NASA_CP_FRM, Ed_unc_TARTU_CP_FRM, Ed_unc_HEREON_CP_FRM, 
+                          diff_Ed_unc_PML,    diff_Ed_unc_NASA,    diff_Ed_unc_TARTU ,   diff_Ed_unc_HEREON,
+                          bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    
+    rp.residuals_combined_V2('Lsky', Lsky_R_CP_FRM, Lsky_PML_CP_FRM, Lsky_NASA_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_HEREON_CP_FRM, 
+                             Lsky_PML, Lsky_NASA, Lsky_TARTU, Lsky_HEREON, 
+                             Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, 
+                             Lsky_unc_PML_CP_FRM, Lsky_unc_NASA_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lsky_unc_HEREON_CP_FRM, 
+                             diff_Lsky_unc_PML,   diff_Lsky_unc_NASA,  diff_Lsky_unc_TARTU ,  diff_Lsky_unc_HEREON,
+                             bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+   
+    rp.residuals_combined_V2('Lt', Lt_R_CP_FRM, Lt_PML_CP_FRM, Lt_NASA_CP_FRM, Lt_TARTU_CP_FRM, Lt_HEREON_CP_FRM, 
+                             Lt_PML, Lt_NASA, Lt_TARTU, Lt_HEREON, 
+                             Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, 
+                             Lt_unc_PML_CP_FRM, Lt_unc_NASA_CP_FRM, Lt_unc_TARTU_CP_FRM, Lt_unc_HEREON_CP_FRM, 
+                             diff_Lt_unc_PML,   diff_Lt_unc_NASA,  diff_Lt_unc_TARTU ,  diff_Lt_unc_HEREON,
+                             bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    
+    rp.residuals_combined_V2('Rrs', Rrs_R_CP_FRM, Rrs_PML_CP_FRM, Rrs_NASA_CP_FRM, Rrs_TARTU_CP_FRM, Rrs_HEREON_CP_FRM, 
+                             Rrs_PML, Rrs_NASA, Rrs_TARTU, Rrs_HEREON,
+                             Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, 
+                             Rrs_unc_PML_CP_FRM, Rrs_unc_NASA_CP_FRM, Rrs_unc_TARTU_CP_FRM, Rrs_unc_HEREON_CP_FRM, 
+                             diff_Rrs_unc_PML,   diff_Rrs_unc_NASA,  diff_Rrs_unc_TARTU,  diff_Rrs_unc_HEREON,
+                             bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+
+
+
+    #rp.residuals_combined_V2('Ed', Ed_R_CP, Ed_PML_CP, Ed_NASA_CP, Ed_TARTU_CP, Ed_HEREON_CP, 
+     #                     Ed_PML_CP_FRM, Ed_NASA_CP_FRM, Ed_TARTU_CP_FRM, Ed_HEREON_CP_FRM,
+      #                    Ed_unc_PML_CP, Ed_unc_NASA_CP, Ed_unc_TARTU_CP, Ed_unc_HEREON_CP, 
+       #                   Ed_unc_PML_CP_FRM, Ed_unc_NASA_CP_FRM, Ed_unc_TARTU_CP_FRM, Ed_unc_HEREON_CP_FRM, 
+        #                  diff_Ed_unc_PML,    diff_Ed_unc_NASA,    diff_Ed_unc_TARTU ,   diff_Ed_unc_HEREON,
+         #                 bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+    
+   # rp.residuals_combined_V2('Lsky', Lsky_R_CP, Lsky_PML_CP, Lsky_NASA_CP, Lsky_TARTU_CP, Lsky_HEREON_CP, 
+    #                         Lsky_PML_CP_FRM, Lsky_NASA_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_HEREON_CP_FRM, 
+     #                        Lsky_unc_PML_CP, Lsky_unc_NASA_CP, Lsky_unc_TARTU_CP, Lsky_unc_HEREON_CP, 
+      #                       Lsky_unc_PML_CP_FRM, Lsky_unc_NASA_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lsky_unc_HEREON_CP_FRM, 
+       #                      diff_Lsky_unc_PML,   diff_Lsky_unc_NASA,  diff_Lsky_unc_TARTU ,  diff_Lsky_unc_HEREON,
+        #                     bands, path_output, Q_mask, Qtype = 'QC_AOC_3')   
+   
+  #  rp.residuals_combined_V2('Lt', Lt_R_CP, Lt_PML_CP, Lt_NASA_CP, Lt_TARTU_CP, Lt_HEREON_CP, 
+   #                          Lt_PML_CP_FRM, Lt_NASA_CP_FRM, Lt_TARTU_CP_FRM, Lt_HEREON_CP_FRM, 
+    #                         Lt_unc_PML_CP, Lt_unc_NASA_CP, Lt_unc_TARTU_CP, Lt_unc_HEREON_CP, 
+     #                        Lt_unc_PML_CP_FRM, Lt_unc_NASA_CP_FRM, Lt_unc_TARTU_CP_FRM, Lt_unc_HEREON_CP_FRM, 
+      #                       diff_Lt_unc_PML,   diff_Lt_unc_NASA,  diff_Lt_unc_TARTU ,  diff_Lt_unc_HEREON,
+       #                      bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
+    
+    
+    #rp.residuals_combined_V2('Rrs', Rrs_R_CP, Rrs_PML_CP, Rrs_NASA_CP, Rrs_TARTU_CP, Rrs_HEREON_CP, 
+     #                        Rrs_PML_CP_FRM, Rrs_NASA_CP_FRM, Rrs_TARTU_CP_FRM, Rrs_HEREON_CP_FRM,
+      #                       Rrs_unc_PML_CP, Rrs_unc_NASA_CP, Rrs_unc_TARTU_CP, Rrs_unc_HEREON_CP, 
+       #                      Rrs_unc_PML_CP_FRM, Rrs_unc_NASA_CP_FRM, Rrs_unc_TARTU_CP_FRM, Rrs_unc_HEREON_CP_FRM, 
+        #                     diff_Rrs_unc_PML,   diff_Rrs_unc_NASA,  diff_Rrs_unc_TARTU,  diff_Rrs_unc_HEREON,
+         #                    bands, path_output, Q_mask, Qtype = 'QC_AOC_3')  
 
 
     ############################################################################
