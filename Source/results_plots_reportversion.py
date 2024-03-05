@@ -308,6 +308,77 @@ def _uncdiff_subplot(spec_type,system, panel, plot_index, ylab, percent_limits, 
 
 
 
+
+def _rad_subplot_FRM(system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
+ 
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,301)) 
+    
+    resid = [] # residual distribution in each band
+    for i in range(10):
+        resid_i =  np.array((df_sys[str(bands[i])]))
+        resid_i =  resid_i[~np.isnan(resid_i)]
+        resid.append(resid_i)
+
+    plt.subplot(4,4,plot_index) 
+    # plt.title(system)
+    #  plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
+ 
+    
+    bp = plt.boxplot(resid, showfliers=True, patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(0.5,10.5)
+    plt.ylim(-percent_limits, percent_limits)
+    for i in range(10):
+        c_index = int(round(float(bands[i]))) - 400
+        bp['boxes'][i].set_facecolor(colors[c_index])
+   
+    
+    bands_round = []
+    for i in range(len(bands)): # round bands to nearest nm
+        bands_round.append(str(round(float(bands[i]))))
+
+
+    if plot_index >12:  
+        plt.xticks([1,2,3,4,5,6,7,8,9,10], bands_round[0:10])
+        plt.xticks(rotation = 45)
+    else:
+          plt.xticks([])
+    
+    plt.title(system)
+    plt.grid(axis='y') 
+ 
+    #if plot_index > 3:
+ 
+    # if plot_index==1 or plot_index== 5:
+    #   plt.ylabel(ylab)
+    # if plot_index > 3:
+    #   plt.xlabel('Wavelength [nm]')
+    ax=plt.gca()
+    plt.text(.05, .95,  panel, ha='left', va='top', transform=ax.transAxes,fontsize=22)  
+   
+    if plot_index==4:
+        plt.text(1.05, 0.95,  '$E_{d}$', ha='left', va='top', transform=ax.transAxes,fontsize=22)   
+       
+    if plot_index==8:
+        plt.text(1.05, 0.95,  '$L_{sky}$', ha='left', va='top', transform=ax.transAxes,fontsize=22)   
+   
+       
+    if plot_index==12:
+        plt.text(1.05, 0.95,  '$L_{t}$', ha='left', va='top', transform=ax.transAxes,fontsize=22)   
+   
+       
+    if plot_index==16:
+        plt.text(1.05, 0.95,  '$R_{rs}$', ha='left', va='top', transform=ax.transAxes,fontsize=22)   
+   
+   
+    return
+
+
+
+
+
+
+
 def _unc_subplot_FRM(system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
     ''' suplot routine for residuals'''  
     colors = cm.rainbow(np.linspace(0,1,301)) 
@@ -1435,6 +1506,127 @@ def FRM_unc_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_E
     return
 
 
+
+def FRM_rad_diffplot(df_PML_Ed, df_NASA_Ed, df_TARTU_Ed, df_HEREON_Ed,
+                     df_PML_Lsky, df_NASA_Lsky, df_TARTU_Lsky, df_HEREON_Lsky,
+                     df_PML_Lt, df_NASA_Lt, df_TARTU_Lt, df_HEREON_Lt,
+                     df_PML_Rrs, df_NASA_Rrs, df_TARTU_Rrs, df_HEREON_Rrs,
+                     bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+                #"Plot for Class- FRM % differences %
+    
+    # QC filtering 
+    df_PML_Ed = df_PML_Ed[Q_mask[Qtype]==1]
+    df_NASA_Ed =  df_NASA_Ed[Q_mask[Qtype]==1]
+    df_TARTU_Ed = df_TARTU_Ed[Q_mask[Qtype]==1]
+    df_HEREON_Ed = df_HEREON_Ed[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_PML_Lsky = df_PML_Lsky[Q_mask[Qtype]==1]
+    df_NASA_Lsky =  df_NASA_Lsky[Q_mask[Qtype]==1]
+    df_TARTU_Lsky = df_TARTU_Lsky[Q_mask[Qtype]==1]
+    df_HEREON_Lsky = df_HEREON_Lsky[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_PML_Lt = df_PML_Lt[Q_mask[Qtype]==1]
+    df_NASA_Lt =  df_NASA_Lt[Q_mask[Qtype]==1]
+    df_TARTU_Lt = df_TARTU_Lt[Q_mask[Qtype]==1]
+    df_HEREON_Lt = df_HEREON_Lt[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_PML_Rrs = df_PML_Rrs[Q_mask[Qtype]==1]
+    df_NASA_Rrs =  df_NASA_Rrs[Q_mask[Qtype]==1]
+    df_TARTU_Rrs = df_TARTU_Rrs[Q_mask[Qtype]==1]
+    df_HEREON_Rrs = df_HEREON_Rrs[Q_mask[Qtype]==1]
+    
+    #row 1 spectral reiduals plot
+    fig =  plt.figure(figsize=(18,16))
+     
+    plt.rc('font',size=18)  
+    ylab = 'Percentage difference in radiometric quantities: 200*(Class $-$ FRM)/(Class + FRM) [%]'
+    xlab = 'Wavelength [nm]'     
+    
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+   
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_Ed['400']))) 
+    index = 1
+    _rad_subplot_FRM(subtitle, 'A.', index, ylab, 8, df_PML_Ed ,bands)
+  
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_Ed['400'])))
+    index = 2
+    _rad_subplot_FRM(subtitle, 'B.', index, ylab, 8, df_TARTU_Ed ,bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_Ed['400'])))
+    index = 3
+    _rad_subplot_FRM(subtitle, 'C.', index, ylab, 8, df_HEREON_Ed ,bands)
+
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_NASA_Ed['400']))) + ' (' + str(np.sum(~np.isnan(df_NASA_Lsky['400']))) +')'        
+    index = 4
+    _rad_subplot_FRM(subtitle, 'D.', index, ylab, 8, df_NASA_Ed,bands )
+    
+    
+    index = 5
+    subtitle  = ''
+    _rad_subplot_FRM(subtitle, 'E.', index, ylab, 8, df_PML_Lsky ,bands)
+  
+    subtitle  = ''
+    index = 6
+    _rad_subplot_FRM(subtitle, 'F.', index, ylab, 8, df_TARTU_Lsky,bands)
+
+    subtitle  = ''
+    index = 7
+    _rad_subplot_FRM(subtitle, 'G.', index, ylab, 8, df_HEREON_Lsky ,bands)
+
+    subtitle  = ''
+    index = 8
+    _rad_subplot_FRM(subtitle, 'H.', index, ylab, 8, df_NASA_Lsky,bands)
+    
+    index = 9
+    subtitle  = ''
+    _rad_subplot_FRM(subtitle, 'I.', index, ylab, 8, df_PML_Lt ,bands)
+
+    subtitle  = ''
+    index = 10
+    _rad_subplot_FRM(subtitle, 'J.', index, ylab, 8, df_TARTU_Lt,bands)
+
+    subtitle  = ''
+    index = 11
+    _rad_subplot_FRM(subtitle, 'K.', index, ylab, 8, df_HEREON_Lt, bands)
+
+    subtitle  = ''
+    index = 12
+    _rad_subplot_FRM(subtitle, 'L.', index, ylab, 8, df_NASA_Lt, bands)
+    
+    
+    index = 13
+    subtitle  = ''
+    _rad_subplot_FRM(subtitle, 'M.', index, ylab, 8, df_PML_Rrs ,bands)
+  
+    subtitle  = ''
+    index = 14
+    _rad_subplot_FRM(subtitle, 'N.', index, ylab, 8, df_TARTU_Rrs,bands)
+
+    subtitle  = ''
+    index = 15
+    _rad_subplot_FRM(subtitle, 'O.', index, ylab, 8, df_HEREON_Rrs ,bands)
+
+    subtitle  = ''
+    index = 16
+    _rad_subplot_FRM(subtitle, 'P.', index, ylab, 8, df_NASA_Rrs,bands)
+    
+    
+    plt.tight_layout(pad=1.2)
+    
+    
+    filename  =  path_output +  '/' +  'Class_FRM_raddiff.png' 
+    plt.savefig(filename, dpi=300)
+    
+
+    return
+
+
+
 def FRM_uncdiff_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_Ed,
                            df_unc_PML_Lsky, df_unc_NASA_Lsky, df_unc_TARTU_Lsky, df_unc_HEREON_Lsky,
                            df_unc_PML_Lt, df_unc_NASA_Lt, df_unc_TARTU_Lt, df_unc_HEREON_Lt,
@@ -1774,7 +1966,7 @@ def residuals_combined_V2(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP
     if spec_type == 'Lt':
          percent_limits = 6
     if spec_type == 'Rrs':
-         percent_limits = 20
+         percent_limits = 20  
 
     xlab = 'Wavelength [nm]'
     fig.supxlabel(xlab)
