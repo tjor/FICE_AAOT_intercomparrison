@@ -4,7 +4,7 @@
 Created on Wed Nov  9 09:58:07 2022
 
 Script that contains file reader functions for AAOT intercomparrision excercise
-CP = `Community Processed' 
+CP = `Community Processed' by HyperCP
 
 Includes spectral convolution to OLCI bands
 
@@ -86,33 +86,42 @@ def read_hyperspectral(institute, var, dir_CP, class_based):
         unit = "mW/m2.nm"
         
     elif "nLw" in var:
-        ref_name = "nLw_mean"
+        # ref_name = "nLw_mean"
+        ref_name = "nLw_HYPER_M02"
+        # ref_name = "nLw_HYPER_Z17"
         ref_std = "nLw_standard_deviation"
         grp = "REFLECTANCE"
-        #  grp_unc = "REFLECTANCE"
+        # grp_unc = "REFLECTANCE"
         grp_std = None
         var_unc = "nLw_HYPER_unc"
+        # var_unc = "nLw_HYPER_Z17_unc"
         unit = "mW/m2.nm"
         
     elif "Rrs" in var:
-        ref_name = "reflectance_mean"
+    #    ref_name = "reflectance_mean"
+        ref_name = "Rrs_HYPER"
         ref_std = "reflectance_standard_deviation"
         grp = "REFLECTANCE"
         # grp_unc = "REFLECTANCE"
         var_unc = "Rrs_HYPER_unc"
         grp_std = None
         unit = "1/sr"
-
+    
+ 
     if class_based == True:
-        dir_data = dir_CP + institute + '/L2_no_NIR_Correction/' # common=processor # 2022 results: defunct
+        dir_data = dir_CP + institute + '/L2_no_NIR_Correction/' # common=processor  
     elif class_based == False:
-        #dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' + institute + '/'
-        dir_data = dir_CP + institute + '/L2/'
+        # dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' + institute + '/'
+        # dir_data = dir_CP + institute + '/L2_Morel/' # common=processor
+       # dir_data = dir_CP + institute + '/L2/'
+        dir_data = dir_CP + institute #  
     print(dir_data)
+    
+    breakpoint()
 
     files = glob.glob(dir_data + "/*.hdf")
 
-  #  breakpoint()
+    breakpoint()
     
     print(len(files))
     # extract no. of timestamps (==stations) and no. of wavelengths
@@ -508,6 +517,20 @@ def time_match_allvars(Ed_IP, Ed_CP, Lsky_CP, Lt_CP, Rrs_CP, bands):
     return  Ed_CP_matching,  Lsky_CP_matching,   Lt_CP_matching,   Rrs_CP_matching
 
 
+def time_match_allvars_withnLw(Ed_IP, Ed_CP, Lsky_CP, Lt_CP, Rrs_CP, nLw_CP, bands):
+    ' Applies time matching to all variables. Ed_IP is used for timestamps'
+    ' Function is called once for each institute'
+        
+    Ed_CP_matching = time_match(Ed_CP, Ed_IP, bands)
+    Lsky_CP_matching = time_match(Lsky_CP, Ed_IP, bands)
+    Lt_CP_matching = time_match(Lt_CP, Ed_IP, bands)
+    Rrs_CP_matching = time_match(Rrs_CP, Ed_IP, bands)
+    nLw_CP_matching = time_match(nLw_CP, Ed_IP, bands)
+
+    return  Ed_CP_matching,  Lsky_CP_matching,   Lt_CP_matching,   Rrs_CP_matching,  nLw_CP_matching
+
+
+
 def read_CP_data(institute, Ed_IP, dir_CP, bands,class_based):
     ' Applies time matching to all variables. Ed_IP is used for timestamps'
     ' Function is called once for each institute'
@@ -523,50 +546,78 @@ def read_CP_data(institute, Ed_IP, dir_CP, bands,class_based):
     Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER', dir_CP, class_based)
     Ed, Ed_unc, time, wv = read_hyperspectral(institute, 'ES_HYPER', dir_CP, class_based)
     Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER', dir_CP, class_based)    
-    Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP, class_based)                                                                      
-  
+    Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP, class_based)    
+                                                                
     
     # spectral convolution - also applies to uncertainty
     Ed = hyperspec_to_OLCIbands(Ed, time, wv, srf, srf_bands, srf_wv)  
     Lsky = hyperspec_to_OLCIbands(Lsky, time, wv, srf, srf_bands, srf_wv)  
     Lt = hyperspec_to_OLCIbands(Lt, time, wv, srf, srf_bands, srf_wv) 
     Rrs = hyperspec_to_OLCIbands(Rrs, time, wv, srf, srf_bands, srf_wv) 
+
     
-    #   if institute != 'NASA':
     Ed_unc = hyperspec_to_OLCIbands(Ed_unc, time, wv, srf, srf_bands, srf_wv)  
     Lsky_unc = hyperspec_to_OLCIbands(Lsky_unc, time, wv, srf, srf_bands, srf_wv)  
     Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
     Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv) 
-    
-   # if institute == 'NASA':
-    #    breakpoint()
-          
-    # Timestamp mathcing to IP-processed data
 
+    
     Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands) # Ed_IP used for timestamps
     Ed_unc, Lsky_unc, Lt_unc, Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
-
   
     return  Ed, Ed_unc, Lsky, Lsky_unc, Lt, Lt_unc, Rrs, Rrs_unc
 
+
+def read_CP_data_withnLw(institute, Ed_IP, dir_CP, bands,class_based):
+    ' Applies time matching to all variables. Ed_IP is used for timestamps'
+    ' Function is called once for each institute'
+    
+     # Unpack SRF
+    dir_srf = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/Source/HSAS/HSAS_Processing/FICE_Formatting' # contains OLCI SRF and template
+    srf, srf_wv, srf_bands = unpack_srf(dir_srf)
+    
+    if institute == 'TARTU':
+        institute = 'UT' # UT = TARTU for hdf file ID
+    
+    # read hyperspectral CP data
+    Rrs, Rrs_unc, time, wv = read_hyperspectral(institute, 'Rrs_HYPER', dir_CP, class_based)
+    Ed, Ed_unc, time, wv = read_hyperspectral(institute, 'ES_HYPER', dir_CP, class_based)
+    Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER', dir_CP, class_based)    
+    Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP, class_based)    
+    nLw, nLw_unc, time, wv = read_hyperspectral(institute, 'nLw_HYPER', dir_CP, class_based)                                                                      
+  
+    # spectral convolution - also applies to uncertainty
+    Ed = hyperspec_to_OLCIbands(Ed, time, wv, srf, srf_bands, srf_wv)  
+    Lsky = hyperspec_to_OLCIbands(Lsky, time, wv, srf, srf_bands, srf_wv)  
+    Lt = hyperspec_to_OLCIbands(Lt, time, wv, srf, srf_bands, srf_wv) 
+    Rrs = hyperspec_to_OLCIbands(Rrs, time, wv, srf, srf_bands, srf_wv) 
+    nLw = hyperspec_to_OLCIbands(nLw, time, wv, srf, srf_bands, srf_wv) 
+    
+    Ed_unc = hyperspec_to_OLCIbands(Ed_unc, time, wv, srf, srf_bands, srf_wv)  
+    Lsky_unc = hyperspec_to_OLCIbands(Lsky_unc, time, wv, srf, srf_bands, srf_wv)  
+    Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
+    Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv)        
+    nLw_unc = hyperspec_to_OLCIbands(nLw_unc, time, wv, srf, srf_bands, srf_wv) 
+    
+    Ed, Lsky, Lt, Rrs, nLw = time_match_allvars_withnLw(Ed_IP, Ed, Lsky, Lt, Rrs, nLw, bands) # Ed_IP used for timestamps
+    Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, nLw_unc = time_match_allvars_withnLw(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, nLw_unc, bands)
+  
+    return  Ed, Ed_unc, Lsky, Lsky_unc, Lt, Lt_unc, Rrs, Rrs_unc, nLw, nLw_unc
 
 
 def read_CP_data_convolved(institute, Ed_IP, dir_CP, bands):
     ' Applies time matching to all variables. Ed_IP is used for timestamps'
     ' Function is called once for each institute'
     
-
-    
     if institute == 'TARTU':
         institute = 'UT' # UT = TARTU for hdf file ID
     
-    # read hyperspectral CP data
+    # read hyperspectral CP data                                                
     Rrs, Rrs_unc, time, wv = read_convolved(institute, 'Rrs_HYPER', dir_CP)
     Ed, Ed_unc, time, wv = read_convolved(institute, 'ES_HYPER', dir_CP)
     Lsky, Lsky_unc, time, wv = read_convolved(institute, 'LI_HYPER', dir_CP)    
     Lt, Lt_unc, time, wv = read_convolved(institute, 'LT_HYPER',dir_CP)                                                                      
-  
-    
+
     # spectral convolution - also applies to uncertainty
     Ed = hyperspec_to_OLCIbands(Ed, time, wv, srf, srf_bands, srf_wv)  
     Lsky = hyperspec_to_OLCIbands(Lsky, time, wv, srf, srf_bands, srf_wv)  
@@ -621,7 +672,7 @@ if __name__ == '__main__':
     # Read Hyperspectral data: HEREON - note: all L2 wavelengths + timestamps are the same
     Ed_HEREON, Ed_unc_HEREON, time_HEREON, wv_HEREON = read_hyperspectral('HEREON', 'ES_HYPER')
     Lsky_HEREON, Lsky_unc_HEREON, time_HEREON, wv_HEREON = read_hyperspectral('HEREON', 'LI_HYPER')
-    Lt_HEREON, Lt_unc_HEREON, time_HEREON, wv_HEREON  = read_hyperspectral('HEREON', 'LT_HYPER')                                                                      
+    Lt_HEREON, Lt_unc_HEREON, time_HEREON, wv_HEREON = read_hyperspectral('HEREON', 'LT_HYPER')                                                                      
     Rrs_HEREON, Rrs_unc_HEREON, time_HEREON, wv_HEREONU = read_hyperspectral('HEREON', 'Rrs_HYPER')
     # nLw_HEREON, nLw_unc_HEREON, time_HEREON, wv_TARTU = read_hyperspectral('UT', 'nLw_HYPER')
     
@@ -659,7 +710,7 @@ if __name__ == '__main__':
     Ed_HEREON = hyperspec_to_OLCIbands(Ed_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
     Lsky_HEREON = hyperspec_to_OLCIbands(Lsky_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
     Lt_HEREON = hyperspec_to_OLCIbands(Lt_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
-    Rrs_HEREON = hyperspec_to_OLCIbands(Rrs_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
+    Rrs_HEREON = hyperspec_to_OLCIbands(Rrs_HEREON,  time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
    
     Ed_unc_HEREON = hyperspec_to_OLCIbands(Ed_unc_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
     Lsky_unc_HEREON = hyperspec_to_OLCIbands(Lsky_unc_HEREON, time_HEREON, wv_HEREON, srf, srf_bands, srf_wv)  
@@ -685,7 +736,7 @@ if __name__ == '__main__':
    
     # OLCI bands
     bands = [str(400), str(412.5), str(442.5),	str(490), str(510), str(560), str(620),	str(665), str(673.75), str(681.25), str(708.75), str(753.75), str(761.25), str(764.375), str(767.5), str(778.75), str(865), str(885), str(900)]
- 
+  
     Ed_PML_IP, Lsky_PML_IP, Lt_PML_IP, Rrs_PML_IP, Rrs_std_PML_IP, nLw_PML_IP = rd_IP.read_PML_data(path_PML, bands)
     Ed_NASA_IP, Lsky_NASA_IP, Lt_NASA_IP, Rrs_NASA_IP, Rrs_std_NASA_IP, nLw_NASA_IP = rd_IP.read_NASA_data(path_NASA, bands)
     Ed_TARTU_IP, Lsky_TARTU_IP, Lt_TARTU_IP, Rrs_TARTU_IP, Rrs_std_TARTU_IP, nLw_TARTU_IP = rd_IP.read_TARTU_data(path_TARTU, bands)
