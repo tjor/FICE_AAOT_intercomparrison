@@ -46,7 +46,7 @@ def _resid_subplot_CP_IP(spec_type,system, panel, plot_index, ylab, percent_limi
             resid.append(resid_i)
 
     #
-    plt.subplot(5,4,plot_index) 
+    plt.subplot(7,4,plot_index) 
     # plt.title(system)
    # plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -68,7 +68,7 @@ def _resid_subplot_CP_IP(spec_type,system, panel, plot_index, ylab, percent_limi
     
     plt.grid(axis='y') 
     
-    if plot_index==17: #or plot_index== 5:
+    if plot_index==25: #or plot_index== 5:
        plt.ylabel(ylab)
     #if plot_index > 3:
      #   plt.xlabel('Wavelength [nm]')
@@ -101,13 +101,13 @@ def _resid_subplot_CP(spec_type, system, panel, plot_index, ylab, percent_limits
             resid.append(resid_i)
 
     print(resid)
-    plt.subplot(5,4,plot_index) 
+    plt.subplot(7,4,plot_index) 
     plt.title(system)
     #plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     plt.plot(np.arange(1,11,1), df_sys_unc[0:10],linestyle ='dashed',color='gray',label = 'Median unc: Class')
-    plt.plot(np.arange(1,11,1), df_sys_unc_FRM[0:10],linestyle ='dotted',color='black',label = 'Median unc: Sensor')
+    #plt.plot(np.arange(1,11,1), df_sys_unc_FRM[0:10],linestyle ='dotted',color='black',label = 'Median unc: Sensor')
     plt.plot(np.arange(1,11,1), -df_sys_unc[0:10],linestyle ='dashed',color='gray')
-    plt.plot(np.arange(1,11,1), -df_sys_unc_FRM[0:10],linestyle ='dotted',color='black')
+  #  plt.plot(np.arange(1,11,1), -df_sys_unc_FRM[0:10],linestyle ='dotted',color='black')
     if plot_index == 1:  # tunred off for nlw
         plt.legend(loc='lower left', fontsize=15)
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -126,6 +126,71 @@ def _resid_subplot_CP(spec_type, system, panel, plot_index, ylab, percent_limits
     plt.grid(axis='y') 
         
     if plot_index==1: #or plot_index== 5:
+       plt.ylabel(ylab)
+       
+    #if plot_index==1 or plot_index== 5:
+     #   plt.ylabel(ylab)
+    #if plot_index > 3:
+    #   plt.xlabel('Wavelength [nm]')
+ 
+    # Set both x- and y-axis limits to [0, 10] instead of default [0, 1]
+    #  ax=plt.gca()
+    ##  ax.text('left', 'top', r'A.', fontsize=18)
+  
+    ax=plt.gca()
+    plt.text(.05, .95,  panel, ha='left', va='top', transform=ax.transAxes,fontsize=20)  
+    
+    return
+
+
+
+def _resid_subplot_CP_FRM(spec_type, system, panel, plot_index, ylab, percent_limits, df_sys, df_sys_unc, df_sys_unc_FRM, df_R ,bands):
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,301)) 
+    
+    
+    if spec_type == 'nLw':
+        resid = [] # res
+        resid.append([])
+        for i in range(1,8,1):# residual disrtibution in each band
+            resid_i = 100*np.array((df_sys[str(bands[i])] -  df_R[str(bands[i])])/df_R[str(bands[i])])
+            resid_i = resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+        resid.append([])
+        resid.append([])
+    else:
+        resid = [] # residual distribution in each band
+        for i in range(10):
+            resid_i = 100*np.array((df_sys[str(bands[i])] -  df_R[str(bands[i])])/df_R[str(bands[i])])
+            resid_i =  resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+
+    print(resid)
+    plt.subplot(7,4,plot_index) 
+    plt.title(system)
+    #plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
+   # plt.plot(np.arange(1,11,1), df_sys_unc[0:10],linestyle ='dashed',color='gray',label = 'Median unc: Class')
+    plt.plot(np.arange(1,11,1), df_sys_unc_FRM[0:10],linestyle ='dotted',color='black',label = 'Median unc: Sensor')
+    #plt.plot(np.arange(1,11,1), -df_sys_unc[0:10],linestyle ='dashed',color='gray')
+    plt.plot(np.arange(1,11,1), -df_sys_unc_FRM[0:10],linestyle ='dotted',color='black')
+    if plot_index == 1:  # tunred off for nlw
+        plt.legend(loc='lower left', fontsize=15)
+    bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(0.5,10.5)
+    plt.ylim(-percent_limits, percent_limits)
+    for i in range(10):
+        c_index = int(round(float(bands[i]))) - 400
+        bp['boxes'][i].set_facecolor(colors[c_index])
+   
+        
+   
+    plt.xticks([1,2,3,4,5,6,7,8,9,10],bands[0:10])
+    plt.xticks([])
+    plt.xticks(rotation = 45)
+    
+    plt.grid(axis='y') 
+        
+    if plot_index==9: #or plot_index== 5:
        plt.ylabel(ylab)
        
     #if plot_index==1 or plot_index== 5:
@@ -162,7 +227,7 @@ def _unc_subplot_CP(spec_type,system, panel, plot_index, ylab, percent_limits, d
             resid_i =  resid_i[~np.isnan(resid_i)]
             resid.append(resid_i)
 
-    plt.subplot(5,4,plot_index) 
+    plt.subplot(7,4,plot_index) 
     # plt.title(system)
     #  plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -183,7 +248,7 @@ def _unc_subplot_CP(spec_type,system, panel, plot_index, ylab, percent_limits, d
     plt.xticks(rotation = 45) 
     plt.grid(axis='y') 
     
-    if plot_index==5: #or plot_index== 5:
+    if plot_index==13: #or plot_index== 5:
        plt.ylabel(ylab)
        
     # if plot_index==1 or plot_index== 5:
@@ -216,7 +281,7 @@ def _unc_subplot_CP_FRM(spec_type,system, panel, plot_index, ylab, percent_limit
             resid_i =  resid_i[~np.isnan(resid_i)]
             resid.append(resid_i)
 
-    plt.subplot(5,4,plot_index) 
+    plt.subplot(7,4,plot_index) 
     # plt.title(system)
     #  plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -237,7 +302,7 @@ def _unc_subplot_CP_FRM(spec_type,system, panel, plot_index, ylab, percent_limit
     plt.xticks(rotation = 45) 
     plt.grid(axis='y') 
     
-    if plot_index==9: #or plot_index== 5:
+    if plot_index==13: #or plot_index== 5:
        plt.ylabel(ylab)
        
     # if plot_index==1 or plot_index== 5:
@@ -271,7 +336,7 @@ def _uncdiff_subplot(spec_type,system, panel, plot_index, ylab, percent_limits, 
             resid_i =  resid_i[~np.isnan(resid_i)]
             resid.append(resid_i)
 
-    plt.subplot(5,4,plot_index) 
+    plt.subplot(7,4,plot_index) 
     # plt.title(system)
     #  plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
     bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
@@ -292,7 +357,7 @@ def _uncdiff_subplot(spec_type,system, panel, plot_index, ylab, percent_limits, 
     plt.xticks(rotation = 45) 
     plt.grid(axis='y') 
     
-    if plot_index == 13: #or plot_index== 5:
+    if plot_index == 21: #or plot_index== 5:
        plt.ylabel(ylab)
        
     if spec_type == 'Rrs':
@@ -305,6 +370,8 @@ def _uncdiff_subplot(spec_type,system, panel, plot_index, ylab, percent_limits, 
     plt.text(.05, .95,  panel, ha='left', va='top', transform=ax.transAxes,fontsize=20)  
    
     return
+
+
 
 
 
@@ -2090,5 +2157,299 @@ def residuals_combined_V2(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP
     filename  =  path_output +  '/' + spec_type + '_summary_FRMversion.png' 
     plt.savefig(filename, dpi=300)
     
+
+    return
+
+
+
+
+def residuals_combined_V3(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, df_HEREON_CP, 
+                          df_R_CP_FRM, df_PML_CP_FRM, df_NASA_CP_FRM, df_TARTU_CP_FRM, df_HEREON_CP_FRM, 
+                          df_PML, df_NASA, df_TARTU, df_HEREON, 
+                          df_PML_diff, df_NASA_diff, df_TARTU_diff, df_HEREON_diff, 
+                          df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON, 
+                          df_unc_PML_FRM, df_unc_NASA_FRM, df_unc_TARTU_FRM, df_unc_HEREON_FRM, 
+                          df_uncdiff_PML, df_uncdiff_NASA, df_uncdiff_TARTU, df_uncdiff_HEREON, 
+                          bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    ''' Combined plot for 4 reference systems processed with HCP:
+        
+        Row 1: HCP 4-way baseline experiment (median uncertainties in background)
+        Row 2: Uncertainty distrbiutions
+        Row 3: HCP versus IP'''  
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+    df_NASA = df_NASA[Q_mask[Qtype]==1]
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+    
+    df_PML_CP = df_PML_CP[Q_mask[Qtype]==1]
+    df_NASA_CP = df_NASA_CP[Q_mask[Qtype]==1]
+    df_TARTU_CP = df_TARTU_CP[Q_mask[Qtype]==1]
+    df_HEREON_CP = df_HEREON_CP[Q_mask[Qtype]==1]
+    
+    df_PML_CP_FRM = df_PML_CP_FRM[Q_mask[Qtype]==1]
+    df_NASA_CP_FRM = df_NASA_CP_FRM[Q_mask[Qtype]==1]
+    df_TARTU_CP_FRM = df_TARTU_CP_FRM[Q_mask[Qtype]==1]
+    df_HEREON_CP_FRM = df_HEREON_CP_FRM[Q_mask[Qtype]==1]
+    
+    
+    df_unc_PML = df_unc_PML[Q_mask[Qtype]==1]
+    df_unc_NASA =  df_unc_NASA[Q_mask[Qtype]==1]
+    df_unc_TARTU = df_unc_TARTU[Q_mask[Qtype]==1]
+    df_unc_HEREON = df_unc_HEREON[Q_mask[Qtype]==1]
+
+    df_unc_PML_FRM = df_unc_PML_FRM[Q_mask[Qtype]==1]
+    df_unc_NASA_FRM =  df_unc_NASA_FRM[Q_mask[Qtype]==1]
+    df_unc_TARTU_FRM = df_unc_TARTU_FRM[Q_mask[Qtype]==1]
+    df_unc_HEREON_FRM = df_unc_HEREON_FRM[Q_mask[Qtype]==1]
+    
+    
+    df_uncdiff_PML = df_uncdiff_PML[Q_mask[Qtype]==1]
+    df_uncdiff_NASA =  df_uncdiff_NASA[Q_mask[Qtype]==1]
+    df_uncdiff_TARTU = df_uncdiff_TARTU[Q_mask[Qtype]==1]
+    df_uncdiff_HEREON = df_uncdiff_HEREON[Q_mask[Qtype]==1]
+    
+    df_R_CP = df_R_CP[Q_mask[Qtype]==1]
+    
+    # 
+    unc_med_PML = np.nanmedian(df_unc_PML.iloc[:,1:-1],0)
+    unc_med_NASA = np.nanmean(df_unc_NASA.iloc[:,1:-1],0)
+    unc_med_TARTU = np.nanmedian(df_unc_TARTU.iloc[:,1:-1],0)
+    unc_med_HEREON = np.nanmedian(df_unc_HEREON.iloc[:,1:-1],0)
+        
+    unc_med_PML_FRM = np.nanmedian(df_unc_PML_FRM.iloc[:,1:-1],0)
+    unc_med_NASA_FRM = np.nanmean(df_unc_NASA_FRM.iloc[:,1:-1],0)
+    unc_med_TARTU_FRM = np.nanmedian(df_unc_TARTU_FRM.iloc[:,1:-1],0)
+    unc_med_HEREON_FRM = np.nanmedian(df_unc_HEREON_FRM.iloc[:,1:-1],0)
+    
+    
+    #row 1 spectral reiduals plot
+    fig= plt.figure(figsize=(18,22))
+
+    
+    plt.rc('font',size=16)  
+   # ylab = 'HCP Class baseline residual: \n 100($X_{HCP}$ - $X_{R}$)/$X_{R}$  [%]'
+    ylab = 'HCP Class residual: \n 100($X_{HCP}$ - $X_{R}$)/$X_{R}$  [%]'
+    if spec_type == 'Ed':
+        percent_limits = 8
+    if spec_type == 'Lsky':
+         percent_limits = 8
+    if spec_type == 'Lt':
+         percent_limits = 5
+    if spec_type == 'Rrs':
+        percent_limits = 10
+    if spec_type == 'nLw':
+        percent_limits = 15
+        
+        
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
+    index = 1
+    _resid_subplot_CP(spec_type, subtitle, 'A.', index, ylab, percent_limits, df_PML_CP, unc_med_PML, unc_med_PML_FRM, df_R_CP, bands)
+  
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
+    index = 2
+    _resid_subplot_CP(spec_type, subtitle,'B.', index, ylab, percent_limits, df_NASA_CP, unc_med_NASA, unc_med_NASA_FRM, df_R_CP, bands)
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
+    index = 3
+    _resid_subplot_CP(spec_type,subtitle, 'C.', index, ylab, percent_limits, df_TARTU_CP, unc_med_TARTU, unc_med_TARTU_FRM, df_R_CP, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
+    index = 4
+    _resid_subplot_CP(spec_type,subtitle, 'D.', index, ylab,percent_limits, df_HEREON_CP, unc_med_HEREON,  unc_med_HEREON_FRM, df_R_CP, bands)
+
+ 
+    if spec_type == 'Ed':
+        percent_limits = 6
+    if spec_type == 'Lsky':
+         percent_limits = 6
+    if spec_type == 'Lt':
+         percent_limits = 6
+    if spec_type == 'Rrs':
+         percent_limits = 20  
+
+    xlab = 'Wavelength [nm]'
+    fig.supxlabel(xlab)
+    ylab = 'Uncertainty: Class [%]  \n'
+    
+    #fig.supylabel(ylab)
+        
+  #  subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
+    index = 5
+    _unc_subplot_CP(spec_type, subtitle,'E.',  index, ylab, percent_limits, df_unc_PML,bands)
+    
+  #  subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['560'])))
+    index = 6
+    _unc_subplot_CP(spec_type, subtitle,'F.', index, ylab, percent_limits, df_unc_NASA, bands)
+    
+# subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
+    index = 7
+    _unc_subplot_CP(spec_type,subtitle, 'G.', index, ylab, percent_limits, df_unc_TARTU,bands)
+
+   # subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
+    index = 8
+    _unc_subplot_CP(spec_type,subtitle, 'H.', index, ylab,percent_limits, df_unc_HEREON,bands)
+
+    
+    plt.rc('font',size=16)  
+   # ylab = 'HCP Class baseline residual: \n 100($X_{HCP}$ - $X_{R}$)/$X_{R}$  [%]'
+    ylab = 'HCP Sensor residual: \n 100($X_{HCP}$ - $X_{R}$)/$X_{R}$  [%]'
+    if spec_type == 'Ed':
+        percent_limits = 8
+    if spec_type == 'Lsky':
+         percent_limits = 8
+    if spec_type == 'Lt':
+         percent_limits = 5
+    if spec_type == 'Rrs':
+        percent_limits = 10
+    if spec_type == 'nLw':
+        percent_limits = 1
+    
+   # subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
+    index = 9
+    _resid_subplot_CP_FRM(spec_type, subtitle, 'I.', index, ylab, percent_limits, df_PML_CP_FRM, unc_med_PML, unc_med_PML_FRM, df_R_CP_FRM, bands)
+  
+  #  subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
+    index = 10
+    _resid_subplot_CP_FRM(spec_type, subtitle,'J.', index, ylab, percent_limits, df_NASA_CP_FRM, unc_med_NASA, unc_med_NASA_FRM, df_R_CP_FRM, bands)
+
+  #  subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
+    index = 11
+    _resid_subplot_CP_FRM(spec_type,subtitle, 'K.', index, ylab, percent_limits, df_TARTU_CP_FRM, unc_med_TARTU, unc_med_TARTU_FRM, df_R_CP_FRM, bands)
+
+  #  subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
+    index = 12
+    _resid_subplot_CP_FRM(spec_type,subtitle, 'L.', index, ylab,percent_limits, df_HEREON_CP_FRM, unc_med_HEREON,  unc_med_HEREON_FRM, df_R_CP_FRM, bands)
+
+    
+    #fig.supylabel(ylab)
+    
+        
+    if spec_type == 'Ed':
+        percent_limits = 6
+    if spec_type == 'Lsky':
+         percent_limits = 6
+    if spec_type == 'Lt':
+         percent_limits = 6
+    if spec_type == 'Rrs':
+         percent_limits = 20
+
+    xlab = 'Wavelength [nm]'
+    fig.supxlabel(xlab)
+    ylab = 'Uncertainty: Sensor [%]  \n'
+    
+        
+  #  subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
+    index = 13
+    _unc_subplot_CP_FRM(spec_type, subtitle,'M.',  index, ylab, percent_limits, df_unc_PML_FRM,bands)
+      
+  #  subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA['560'])))
+    index = 14
+    _unc_subplot_CP_FRM(spec_type, subtitle,'N.', index, ylab, percent_limits, df_unc_NASA_FRM, bands)
+    
+   # subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
+    index = 15
+    _unc_subplot_CP_FRM(spec_type, subtitle,'O.', index, ylab, percent_limits, df_unc_TARTU_FRM,bands)
+
+   # subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
+    index = 16
+    _unc_subplot_CP_FRM(spec_type, subtitle,'P', index, ylab,percent_limits, df_unc_HEREON_FRM,bands)
+
+
+
+    ylab = 'Difference: \n' + r' 100$\frac{(Class - Sensor)}{(Sensor)}$ [%]'
+    xlab = 'Wavelength [nm]'   
+   
+    if spec_type == 'Ed':
+        percent_limits = 130
+    if spec_type == 'Lsky':
+         percent_limits = 100
+    if spec_type == 'Lt':
+         percent_limits = 100
+    if spec_type == 'Rrs':
+         percent_limits = 100
+        
+         
+    index = 17
+    _uncdiff_subplot(spec_type,subtitle, 'Q.', index, ylab, percent_limits, df_PML_diff, bands)
+   
+    index = 18
+    _uncdiff_subplot(spec_type,subtitle, 'R.', index, ylab, percent_limits, df_NASA_diff, bands)
+    
+    index = 19
+    _uncdiff_subplot(spec_type,subtitle, 'S.', index, ylab, percent_limits, df_TARTU_diff, bands)
+    
+    index = 20
+    _uncdiff_subplot(spec_type,subtitle, 'T.', index, ylab, percent_limits, df_HEREON_diff, bands)
+
+    
+
+    ylab = 'Uncertainty difference: \n' + r' 200$\frac{(Class - Sensor)}{(Class + Sensor)}$ [%]'
+    xlab = 'Wavelength [nm]'   
+   
+    if spec_type == 'Ed':
+        percent_limits = 130
+    if spec_type == 'Lsky':
+         percent_limits = 100
+    if spec_type == 'Lt':
+         percent_limits = 100
+    if spec_type == 'Rrs':
+         percent_limits = 100
+        
+         
+    index = 21
+    _uncdiff_subplot(spec_type,subtitle, 'U.', index, ylab, percent_limits, df_uncdiff_PML ,bands)
+   
+    index = 22
+    _uncdiff_subplot(spec_type,subtitle, 'V.', index, ylab, percent_limits, df_uncdiff_NASA ,bands)
+    
+    index = 23
+    _uncdiff_subplot(spec_type,subtitle, 'W.', index, ylab, percent_limits, df_uncdiff_TARTU ,bands)
+    
+    index = 24
+    _uncdiff_subplot(spec_type,subtitle, 'X.', index, ylab, percent_limits, df_uncdiff_HEREON ,bands)
+
+    
+    if spec_type == 'Ed':
+        percent_limits = 6 # 2 for class
+    if spec_type == 'Lsky': 
+        percent_limits = 6 # 3 for class
+    if spec_type == 'Lt':
+        percent_limits = 10
+    if spec_type == 'Rrs':
+        percent_limits = 20
+    if spec_type == 'nLw':
+        percent_limits = 40
+
+    xlab = 'Wavelength [nm]'
+    ylab = 'IP residual from HCP Class: \n 100($X_{IP}$ - $X_{HCP}$)/$X_{HCP}$   [%]'
+    ylab = 'IP residual from HCP Sensor: \n 100($X_{IP}$ - $X_{HCP}$)/$X_{HCP}$   [%]'
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+        
+    subtitle  = 'PML: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
+    index = 25
+    _resid_subplot_CP_IP(spec_type, subtitle,'Y.', index, ylab, percent_limits, df_PML, df_PML_CP,bands)
+
+
+    subtitle  = 'TARTU: N = ' + str(np.sum(~np.isnan(df_TARTU_CP['400'])))
+    index = 26
+    _resid_subplot_CP_IP(spec_type,subtitle, 'Z.',index, ylab, percent_limits, df_TARTU, df_TARTU_CP ,bands)
+
+   # subtitle  = 'HEREON: N = ' + str(np.sum(~np.isnan(df_HEREON_CP['400'])))
+    index = 27
+    _resid_subplot_CP_IP(spec_type,subtitle, 'AA.', index, ylab,percent_limits, df_HEREON, df_HEREON_CP ,bands)
+    
+   # subtitle  = 'NASA: N = ' + str(np.sum(~np.isnan(df_NASA_CP['400'])))
+    index = 28
+    _resid_subplot_CP_IP(spec_type, subtitle,'BB.', index, ylab, percent_limits, df_NASA, df_NASA_CP ,bands)
+    
+    plt.tight_layout(pad=1.1)
+    
+    
+  #  filename  =  path_output +  '/' + spec_type + '_summary_FRMversion.png' 
+  #  plt.savefig(filename, dpi=300)
+  
 
     return

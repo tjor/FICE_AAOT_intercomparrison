@@ -334,6 +334,61 @@ def _unc_subplot_CP_FRM(spec_type,system, panel, plot_index, ylab, percent_limit
 
 
 
+def _unc_subplot_CP_FRM_nLW(spec_type,system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,301)) 
+    
+    if spec_type == 'nLw':
+        resid = [] # res
+        resid.append([])
+        for i in range(1,8,1):# residual disrtibution in each band
+            resid_i = np.array((df_sys[str(bands[i])]))
+            resid_i = resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+        resid.append([])
+        resid.append([])
+    else:
+        resid = [] # residual distribution in each band
+        for i in range(10):
+            resid_i =  np.array((df_sys[str(bands[i])]))
+            resid_i =  resid_i[~np.isnan(resid_i)]
+            resid.append(resid_i)
+
+    plt.subplot(4,4,plot_index) 
+    plt.title(system)
+    #  plt.plot(np.arange(0,12,1), np.zeros(12),linestyle ='dashed',color='gray')
+    bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(1.5,8.5)
+    plt.ylim(0, percent_limits)
+    for i in range(10):
+        c_index = int(round(float(bands[i]))) - 400
+        bp['boxes'][i].set_facecolor(colors[c_index])
+   
+    
+    bands_round = []
+    for i in range(len(bands)): # round bands to nearest nm
+        bands_round.append(str(round(float(bands[i]))))
+   
+    
+    plt.xticks([])
+    plt.xticks(rotation = 45) 
+    plt.grid(axis='y') 
+    
+    if plot_index == 9 or plot_index== 13:
+       plt.ylabel(ylab)
+       
+    # if plot_index==1 or plot_index== 5:
+    #   plt.ylabel(ylab)
+    if plot_index > 12:
+       plt.xlabel('Wavelength [nm]')  
+       plt.xticks([2,3,4,5,6,7,8],bands_round[1:8])
+       plt.xticks(rotation = 45)
+    ax=plt.gca()
+    plt.text(.05, .95,  panel, ha='left', va='top', transform=ax.transAxes,fontsize=20)  
+   
+    return
+
+
 def _uncdiff_subplot(spec_type,system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
     ''' suplot routine for residuals'''  
     colors = cm.rainbow(np.linspace(0,1,301)) 
@@ -418,9 +473,9 @@ def _rad_subplot_FRM(system, panel, plot_index, ylab, percent_limits, df_sys ,ba
         bp['boxes'][i].set_facecolor(colors[c_index])
    
     
-    bands_round = []
+    bands_round = []  
     for i in range(len(bands)): # round bands to nearest nm
-        bands_round.append(str(round(float(bands[i]))))
+            bands_round.append(str(round(float(bands[i]))))
 
 
     if plot_index >12:  
@@ -531,6 +586,66 @@ def _unc_subplot_FRM(system, panel, plot_index, ylab, percent_limits, df_sys ,ba
 
 
 
+def _unc_subplot_FRM_nLw(system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
+    ''' suplot routine for residuals'''  
+    colors = cm.rainbow(np.linspace(0,1,301)) 
+        
+ 
+    resid = [] # res
+    resid.append([])
+    for i in range(1,8,1):# residual disrtibution in each band
+        resid_i = df_sys[str(bands[i])]
+        resid_i = resid_i[~np.isnan(resid_i)]
+        resid.append(resid_i)
+    resid.append([])
+    resid.append([])
+
+    print(resid)
+    plt.subplot(3,4,plot_index) 
+    plt.title(system)
+
+
+    bp = plt.boxplot(resid ,showfliers=True,patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
+    plt.xlim(1.5,8.5)
+    plt.ylim(0,percent_limits)
+    for i in range(10):
+        c_index = int(round(float(bands[i]))) - 400
+        bp['boxes'][i].set_facecolor(colors[c_index])
+    
+    bands_round = []
+    for i in range(len(bands)): # round bands to nearest nm
+        bands_round.append(str(round(float(bands[i]))))
+   
+    plt.xticks([2,3,4,5,6,7,8],bands_round[1:8])
+    #plt.xticks([])
+    plt.xticks(rotation = 45) 
+    plt.grid(axis='y') 
+    
+        
+    #if plot_index==1 or plot_index== 6:
+    #   plt.ylabel(ylab)
+            
+    if plot_index < 9:
+        plt.xticks([])
+    
+       
+    #if plot_index==1 or plot_index== 5:
+     #   plt.ylabel(ylab)
+    #if plot_index > 3:
+    #   plt.xlabel('Wavelength [nm]')
+ 
+    # Set both x- and y-axis limits to [0, 10] instead of default [0, 1]
+    #  ax=plt.gca()
+    ##  ax.text('left', 'top', r'A.', fontsize=18)
+  
+    ax=plt.gca()
+    plt.text(.05, .95,  panel, ha='left', va='top', transform=ax.transAxes,fontsize=20)  
+    
+    return
+
+
+
+
 def _unc_subplot_FRM_V2(system, panel, plot_index, ylab, percent_limits, df_sys ,bands):
     ''' suplot routine for residuals'''  
     colors = cm.rainbow(np.linspace(0,1,301)) 
@@ -617,7 +732,7 @@ def _unc_subplot_FRM_V3(system, panel, plot_index, ylab, percent_limits, df_sys 
     
     bp = plt.boxplot(resid, showfliers=True, patch_artist=True, medianprops=dict(color='black'), whis=[10,90]) 
     plt.xlim(0.5,10.5)
-    plt.ylim(-20, percent_limits)
+    plt.ylim(-7, 7)
     for i in range(10):
         c_index = int(round(float(bands[i]))) - 400
         bp['boxes'][i].set_facecolor(colors[c_index])
@@ -669,7 +784,6 @@ def _resid_subplot_nLw(spec_type, system, panel, plot_index, ylab, percent_limit
     ''' suplot routine for residuals'''  
     colors = cm.rainbow(np.linspace(0,1,301)) 
         
-    
     if spec_type == 'nLw':
         resid = [] # res
         resid.append([])
@@ -741,7 +855,7 @@ def _resid_subplot_nLw_v2(spec_type, system, panel, plot_index, ylab, percent_li
         resid.append([])
 
     print(resid)
-    plt.subplot(3,5,plot_index) 
+    plt.subplot(4,4,plot_index) 
     plt.title(system)
 
 
@@ -760,14 +874,12 @@ def _resid_subplot_nLw_v2(spec_type, system, panel, plot_index, ylab, percent_li
     #plt.xticks([])
     plt.xticks(rotation = 45) 
     plt.grid(axis='y') 
-    
         
-    if plot_index==1 or plot_index== 6 or plot_index== 11:
+    if plot_index==1 or plot_index== 5 or plot_index== 9:
        plt.ylabel(ylab)
             
-    if plot_index < 11:
+    if plot_index < 9:
         plt.xticks([])
-    
        
     #if plot_index==1 or plot_index== 5:
      #   plt.ylabel(ylab)
@@ -1151,6 +1263,7 @@ def residuals_combined_nlw_v2(spec_type, df_SEAPRISM, df_NOAA, df_RAFT, df_PML, 
   
     xlab = 'Wavelength [nm]'
     ylab = '100($X_{IP}$ - $X_{R}$)/$X_{R}$: SeaPRISM  [%]'
+    
         
     subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
     index = 1
@@ -1583,8 +1696,6 @@ def residualbaseline_plot(df_Ed_R, df_PML_Ed, df_NASA_Ed, df_TARTU_Ed, df_HEREON
 
 
 
-
-
 def unc_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_Ed,
                            df_unc_PML_Lsky, df_unc_NASA_Lsky, df_unc_TARTU_Lsky, df_unc_HEREON_Lsky,
                            df_unc_PML_Lt, df_unc_NASA_Lt, df_unc_TARTU_Lt, df_unc_HEREON_Lt,
@@ -1639,7 +1750,7 @@ def unc_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_Ed,
 
     subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_unc_TARTU_Ed['400'])))
     index = 3
-    _unc_subplot_FRM(subtitle, 'C.', index, ylab, 6, df_unc_PML_Ed ,bands)
+    _unc_subplot_FRM(subtitle, 'C.', index, ylab, 6, df_unc_TARTU_Ed ,bands)
 
     subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_unc_HEREON_Ed['400'])))
     index = 4
@@ -1713,6 +1824,118 @@ def unc_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_Ed,
         filename  =  path_output +  '/' +  'Class_unc.png' 
     elif class_based==False:
         filename  =  path_output +  '/' +  'Sensor_unc.png' 
+
+  
+    
+    plt.savefig(filename, dpi=300)
+    
+
+    return
+
+
+
+
+def unc_plot_nLw(df_SEAPRISM, df_NOAA, df_RAFT, df_PML, df_NASA, df_TARTU, df_HEREON, bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+                               
+    "Plot for FRM Uncertainy distributions"
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+    df_NASA =  df_NASA[Q_mask[Qtype]==1]
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+    
+    df_SEAPRISM = df_SEAPRISM[Q_mask[Qtype]==1]
+    df_NOAA = df_NOAA[Q_mask[Qtype]==1]
+    df_RAFT = df_RAFT[Q_mask[Qtype]==1]
+ 
+     
+    df_PML_NOAA_match = df_PML[~np.isnan(df_NOAA['560'])] # filters for NaNs in HP dayta
+    df_NASA_NOAA_match =  df_NASA[~np.isnan(df_NOAA['560'])] 
+     # df_NASA2_NOAA_match = df_NASA2[~np.isnan(df_NOAA['560'])] 
+    df_TARTU_NOAA_match = df_TARTU[~np.isnan(df_NOAA['560'])] 
+    df_HEREON_NOAA_match = df_HEREON[~np.isnan(df_NOAA['560'])] 
+     
+      
+    df_PML_RAFT_match = df_PML[~np.isnan(df_RAFT['560'])] # filters for NaNs in RAFTdata
+    df_NASA_RAFT_match =  df_NASA[~np.isnan(df_RAFT['560'])] 
+     # df_NASA2_RAFT_match = df_NASA2[~np.isnan(df_RAFT['560'])] 
+    df_TARTU_RAFT_match = df_TARTU[~np.isnan(df_RAFT['560'])] 
+    df_HEREON_RAFT_match = df_HEREON[~np.isnan(df_RAFT['560'])] 
+        
+    
+    #row 1 spectral reiduals plot
+    fig =  plt.figure(figsize=(18,16))
+     
+    plt.rc('font',size=18)  
+    xlab = 'Wavelength [nm]'     
+    
+
+    ylab =  'Uncertainty: HCP-Sensor [%]'
+
+    
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML['560']))) 
+    index = 1
+    _unc_subplot_FRM_nLw(subtitle, 'A.', index, ylab, 15, df_PML ,bands)
+  
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_NASA['560']))) 
+    index = 2
+    _unc_subplot_FRM_nLw(subtitle, 'B.', index, ylab, 15, df_NASA,bands )
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
+    index = 3
+    _unc_subplot_FRM_nLw(subtitle, 'C.', index, ylab, 15, df_TARTU ,bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
+    index = 4
+    _unc_subplot_FRM_nLw(subtitle, 'D.', index, ylab, 15, df_HEREON ,bands)
+    
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_NOAA_match['560']))) 
+    index = 5
+    _unc_subplot_FRM_nLw(subtitle, 'E.', index, ylab, 15, df_PML_NOAA_match ,bands)
+  
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_NASA_NOAA_match['560']))) 
+    index = 6
+    _unc_subplot_FRM_nLw(subtitle, 'F.', index, ylab, 15, df_NASA_NOAA_match,bands )
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_NOAA_match['560'])))
+    index = 7
+    _unc_subplot_FRM_nLw(subtitle, 'G.', index, ylab, 15, df_TARTU_NOAA_match ,bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_NOAA_match['560'])))
+    index = 8
+    _unc_subplot_FRM_nLw(subtitle, 'H.', index, ylab, 15, df_HEREON_NOAA_match,bands)
+
+
+
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_RAFT_match['560']))) 
+    index = 9
+    _unc_subplot_FRM_nLw(subtitle, 'I.', index, ylab, 15, df_PML_RAFT_match ,bands)
+  
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_NASA_RAFT_match['560']))) 
+    index = 10
+    _unc_subplot_FRM_nLw(subtitle, 'J.', index, ylab, 15, df_NASA_RAFT_match,bands )
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_RAFT_match['560'])))
+    index = 11
+    _unc_subplot_FRM_nLw(subtitle, 'K.', index, ylab, 15, df_TARTU_RAFT_match ,bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_RAFT_match['560'])))
+    index = 12
+    _unc_subplot_FRM_nLw(subtitle, 'L.', index, ylab, 15, df_HEREON_RAFT_match,bands)
+
+  
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+
+  
+    plt.tight_layout(pad=1.2)
+    
+
+    filename  =  path_output +  '/' +  'nLW_Sensor_unc.png' 
 
   
     
@@ -2088,6 +2311,131 @@ def FRM_uncdiffV2_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HE
     return
 
 
+
+
+def FRM_uncdiff_plot(df_unc_PML_Ed, df_unc_NASA_Ed, df_unc_TARTU_Ed, df_unc_HEREON_Ed,
+                           df_unc_PML_Lsky, df_unc_NASA_Lsky, df_unc_TARTU_Lsky, df_unc_HEREON_Lsky,
+                           df_unc_PML_Lt, df_unc_NASA_Lt, df_unc_TARTU_Lt, df_unc_HEREON_Lt,
+                           df_unc_PML_Rrs, df_unc_NASA_Rrs, df_unc_TARTU_Rrs, df_unc_HEREON_Rrs,
+                           bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    "Plot for FRM Uncertainy distributions"
+    
+    # QC filtering 
+    df_unc_PML_Ed = df_unc_PML_Ed[Q_mask[Qtype]==1]
+    df_unc_NASA_Ed =  df_unc_NASA_Ed[Q_mask[Qtype]==1]
+    df_unc_TARTU_Ed = df_unc_TARTU_Ed[Q_mask[Qtype]==1]
+    df_unc_HEREON_Ed = df_unc_HEREON_Ed[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_unc_PML_Lsky = df_unc_PML_Lsky[Q_mask[Qtype]==1]
+    df_unc_NASA_Lsky =  df_unc_NASA_Lsky[Q_mask[Qtype]==1]
+    df_unc_TARTU_Lsky = df_unc_TARTU_Lsky[Q_mask[Qtype]==1]
+    df_unc_HEREON_Lsky = df_unc_HEREON_Lsky[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_unc_PML_Lt = df_unc_PML_Lt[Q_mask[Qtype]==1]
+    df_unc_NASA_Lt =  df_unc_NASA_Lt[Q_mask[Qtype]==1]
+    df_unc_TARTU_Lt = df_unc_TARTU_Lt[Q_mask[Qtype]==1]
+    df_unc_HEREON_Lt = df_unc_HEREON_Lt[Q_mask[Qtype]==1]
+    
+    # QC filtering 
+    df_unc_PML_Rrs = df_unc_PML_Rrs[Q_mask[Qtype]==1]
+    df_unc_NASA_Rrs =  df_unc_NASA_Rrs[Q_mask[Qtype]==1]
+    df_unc_TARTU_Rrs = df_unc_TARTU_Rrs[Q_mask[Qtype]==1]
+    df_unc_HEREON_Rrs = df_unc_HEREON_Rrs[Q_mask[Qtype]==1]
+    
+    #row 1 spectral reiduals plot
+    fig =  plt.figure(figsize=(18,16))
+     
+    plt.rc('font',size=18)  
+    ylab = 'Difference in percentage uncertainties: $X_{Class}$ - $X_{Sensor}$ [%]'
+    xlab = 'Wavelength [nm]'     
+    
+    fig.supxlabel(xlab)
+    fig.supylabel(ylab)
+   
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_unc_PML_Ed['400']))) 
+    index = 1
+    _unc_subplot_FRM(subtitle, 'A.', index, ylab, 5, df_unc_PML_Ed ,bands)
+  
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_unc_NASA_Ed['400']))) + ' (' + str(np.sum(~np.isnan(df_unc_NASA_Lsky['400']))) +')'        
+    index = 2
+    _unc_subplot_FRM(subtitle, 'B.', index, ylab, 5, df_unc_NASA_Ed,bands )
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_unc_TARTU_Ed['400'])))
+    index = 3
+    _unc_subplot_FRM(subtitle, 'C.', index, ylab, 5, df_unc_TARTU_Ed ,bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_unc_HEREON_Ed['400'])))
+    index = 4
+    _unc_subplot_FRM(subtitle, 'D.', index, ylab, 5, df_unc_HEREON_Ed ,bands)
+    
+
+    index = 5
+    subtitle  = ''
+    _unc_subplot_FRM(subtitle, 'E.', index, ylab, 3, df_unc_PML_Lsky ,bands)
+
+    subtitle  = ''
+    index = 6
+    _unc_subplot_FRM(subtitle, 'F.', index, ylab, 3, df_unc_NASA_Lsky,bands)
+        
+    subtitle  = ''
+    index = 7
+    _unc_subplot_FRM(subtitle, 'G.', index, ylab, 3, df_unc_TARTU_Lsky,bands)
+
+    subtitle  = ''
+    index = 8
+    _unc_subplot_FRM(subtitle, 'H.', index, ylab, 3, df_unc_HEREON_Lsky ,bands)
+
+
+    
+    index = 9
+    subtitle  = ''
+    _unc_subplot_FRM(subtitle, 'I.', index, ylab, 3, df_unc_PML_Lt ,bands)
+  
+    subtitle  = ''
+    index = 10
+    _unc_subplot_FRM(subtitle, 'J.', index, ylab, 3, df_unc_NASA_Lt,bands)
+    
+    subtitle  = ''
+    index = 11
+    _unc_subplot_FRM(subtitle, 'K.', index, ylab, 3, df_unc_TARTU_Lt,bands)
+
+    subtitle  = ''
+    index = 12
+    _unc_subplot_FRM(subtitle, 'L.', index, ylab, 3, df_unc_HEREON_Lt ,bands)
+
+
+
+    index = 13
+    subtitle  = ''
+    _unc_subplot_FRM_V3(subtitle, 'M.', index, ylab,7, df_unc_PML_Rrs, bands)
+  
+    subtitle  = ''
+    index = 14
+    _unc_subplot_FRM_V3(subtitle, 'N.', index, ylab,7, df_unc_NASA_Rrs, bands)
+    
+    subtitle  = ''
+    index = 15
+    _unc_subplot_FRM_V3(subtitle, 'O.', index, ylab, 7, df_unc_TARTU_Rrs, bands)
+
+    subtitle  = ''
+    index = 16
+    _unc_subplot_FRM_V3(subtitle, 'P.', index, ylab, 7, df_unc_HEREON_Rrs,bands)
+    
+    
+    plt.tight_layout(pad=1.2)
+    
+    
+    filename  =  path_output +  '/' +  'FRM_uncdiff.png' 
+    plt.savefig(filename, dpi=300)
+    
+
+    return
+
+
+
 def residuals_combined_V2(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP, df_HEREON_CP, 
                           df_PML, df_NASA, df_TARTU, df_HEREON, 
                           df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON, 
@@ -2159,7 +2507,12 @@ def residuals_combined_V2(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP
         percent_limits = 10
     if spec_type == 'nLw':
         percent_limits = 15
-        
+        df_PML = df_PML[Q_mask[Qtype]==1]
+        df_NASA = df_NASA[Q_mask[Qtype]==1]
+        # df_NASA2 = df_NASA2[Q_mask[Qtype]==1]
+        df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+        df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+      
         
     subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_CP['400'])))
     index = 1
@@ -2307,6 +2660,266 @@ def residuals_combined_V2(spec_type, df_R_CP, df_PML_CP, df_NASA_CP, df_TARTU_CP
     
     
     filename  =  path_output +  '/' + spec_type + '_summary_FRMversion.png' 
+    plt.savefig(filename, dpi=300)
+    
+
+    return
+
+
+
+def residuals_combined_nlw_v2(spec_type, df_SEAPRISM, df_NOAA, df_RAFT,
+                              df_PML, df_NASA, df_TARTU, df_HEREON, 
+                              bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+    
+    ''' Combined plot for nlw
+    #      Row 1: Seaprism baseline
+    #      Row 2: Hyperpro'''
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+    df_NASA = df_NASA[Q_mask[Qtype]==1]
+    # df_NASA2 = df_NASA2[Q_mask[Qtype]==1]
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+  
+    df_SEAPRISM = df_SEAPRISM[Q_mask[Qtype]==1]
+    df_NOAA =  df_NOAA[Q_mask[Qtype]==1]
+    df_RAFT =  df_RAFT[Q_mask[Qtype]==1]
+    
+    
+    df_PML_NOAA_match = df_PML[~np.isnan(df_NOAA['560'])] # filters for NaNs in HP dayta
+    df_NASA_NOAA_match =  df_NASA[~np.isnan(df_NOAA['560'])] 
+    # df_NASA2_NOAA_match = df_NASA2[~np.isnan(df_NOAA['560'])] 
+    df_TARTU_NOAA_match = df_TARTU[~np.isnan(df_NOAA['560'])] 
+    df_HEREON_NOAA_match = df_HEREON[~np.isnan(df_NOAA['560'])] 
+    
+     
+    df_PML_RAFT_match = df_PML[~np.isnan(df_RAFT['560'])] # filters for NaNs in RAFTdata
+    df_NASA_RAFT_match =  df_NASA[~np.isnan(df_RAFT['560'])] 
+    # df_NASA2_RAFT_match = df_NASA2[~np.isnan(df_RAFT['560'])] 
+    df_TARTU_RAFT_match = df_TARTU[~np.isnan(df_RAFT['560'])] 
+    df_HEREON_RAFT_match = df_HEREON[~np.isnan(df_RAFT['560'])] 
+    
+    #row 1 spectral reiduals plot
+    fig= plt.figure(figsize=(17,18))
+    
+    plt.rc('font',size=18)  
+  
+    percent_limits  = 25
+  
+    xlab = 'Wavelength [nm]'
+    ylab = '100($X_{Sensor}$ - $X_{R}$)/$X_{R}$: SeaPRISM  [%]'
+        
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
+    index = 1
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'A.', index, ylab, percent_limits, df_PML, df_SEAPRISM, bands)
+  
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
+    index = 3
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'B.', index, ylab, percent_limits, df_TARTU, df_SEAPRISM, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
+    index = 4
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'C.', index, ylab,percent_limits, df_HEREON, df_SEAPRISM, bands)
+
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA['560'])))
+    index = 2
+    _resid_subplot_nLw_v2(spec_type, subtitle,'D.', index, ylab, percent_limits, df_NASA, df_SEAPRISM, bands)
+    
+ #   subtitle  = 'pySAS-v2: N = ' + str(np.sum(~np.isnan(df_NASA2['560'])))
+  #  index = 5
+  #  _resid_subplot_nLw_v2(spec_type, subtitle,'E.', index, ylab, percent_limits, df_NASA2, df_SEAPRISM, bands)
+    
+
+    xlab = 'Wavelength [nm]'
+    ylab = '100($X_{Sensor}$ - $X_{R}$)/$X_{R}$: HyperPro II [%]'
+
+    fig.supxlabel(xlab)
+    
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_NOAA_match['560'])))
+    index = 5
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'F.', index, ylab, percent_limits, df_PML, df_NOAA, bands)
+  
+    subtitle  =  'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_NOAA_match['560'])))
+    index = 7
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'G.', index, ylab, percent_limits, df_TARTU, df_NOAA, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_NOAA_match['560'])))
+    index = 8
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'H.', index, ylab,percent_limits, df_HEREON, df_NOAA, bands)
+
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_NOAA_match['560'])))
+    index = 6
+    _resid_subplot_nLw_v2(spec_type, subtitle,'I.', index, ylab, percent_limits, df_NASA, df_NOAA, bands)
+    
+  #  subtitle  = 'pySAS-v2: N = ' + str(np.sum(~np.isnan(df_NASA_NOAA_match['560'])))
+  #  index = 10
+  #  _resid_subplot_nLw_v2(spec_type, subtitle,'J.', index, ylab, percent_limits, df_NASA2, df_NOAA, bands)
+
+   
+    xlab = 'Wavelength [nm]'
+    ylab = '100($X_{Sensor}$ - $X_{R}$)/$X_{R}$: Hereon Raft [%]'
+
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_RAFT_match['560'])))
+    index = 9
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'K.', index, ylab, percent_limits, df_PML, df_RAFT, bands)
+  
+    subtitle  =  'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_RAFT_match['560'])))
+    index = 11
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'L.', index, ylab, percent_limits, df_TARTU, df_RAFT, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_RAFT_match['560'])))
+    index = 12
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'M.', index, ylab,percent_limits, df_HEREON, df_RAFT, bands)
+
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_RAFT_match['560'])))
+    index = 10
+    _resid_subplot_nLw_v2(spec_type, subtitle,'N.', index, ylab, percent_limits, df_NASA, df_RAFT, bands)
+    
+#    subtitle  = 'pySAS-v2: N = ' + str(np.sum(~np.isnan(df_NASA_RAFT_match['560'])))
+#    index = 15
+  #  _resid_subplot_nLw_v2(spec_type, subtitle,'O.', index, ylab, percent_limits, df_NASA2, df_RAFT, bands)
+
+    
+
+    plt.tight_layout(pad=1.2)
+    
+    
+    filename  =  path_output +  '/' + spec_type + '_summary_withraft.png' 
+    plt.savefig(filename, dpi=300)
+    
+
+    return
+
+
+def residuals_unc_nlw(spec_type,  df_SEAPRISM, df_NOAA,
+                              df_PML, df_NASA, df_TARTU, df_HEREON, 
+                              df_unc_PML, df_unc_NASA, df_unc_TARTU, df_unc_HEREON,
+                              bands, path_output, Q_mask, Qtype = 'QC_AOC_3'):
+  
+    ''' Combined plot for nlw
+    #      Row 1: Seaprism baseline
+    #      Row 2: Hyperpro'''
+    
+    # QC filtering 
+    df_PML = df_PML[Q_mask[Qtype]==1]
+    df_NASA = df_NASA[Q_mask[Qtype]==1]
+
+    df_TARTU = df_TARTU[Q_mask[Qtype]==1]
+    df_HEREON = df_HEREON[Q_mask[Qtype]==1]
+    
+    df_unc_PML = df_unc_PML[Q_mask[Qtype]==1]
+    df_unc_NASA = df_unc_NASA[Q_mask[Qtype]==1]
+    df_unc_TARTU = df_unc_TARTU[Q_mask[Qtype]==1]
+    df_unc_HEREON = df_unc_HEREON[Q_mask[Qtype]==1]
+
+    df_SEAPRISM = df_SEAPRISM[Q_mask[Qtype]==1]
+    df_NOAA =  df_NOAA[Q_mask[Qtype]==1]
+
+    df_PML_NOAA_match = df_PML[~np.isnan(df_NOAA['560'])] # filters for NaNs in HP data
+    df_NASA_NOAA_match =  df_NASA[~np.isnan(df_NOAA['560'])] 
+    # df_NASA2_NOAA_match = df_NASA2[~np.isnan(df_NOAA['560'])] 
+    df_TARTU_NOAA_match = df_TARTU[~np.isnan(df_NOAA['560'])] 
+    df_HEREON_NOAA_match = df_HEREON[~np.isnan(df_NOAA['560'])] 
+    
+    df_unc_PML_NOAA_match = df_unc_PML[~np.isnan(df_NOAA['560'])] # filters for NaNs in HP data
+    df_unc_NASA_NOAA_match =  df_unc_NASA[~np.isnan(df_NOAA['560'])] 
+    # df_NASA2_NOAA_match = df_NASA2[~np.isnan(df_NOAA['560'])] 
+    df_unc_TARTU_NOAA_match = df_unc_TARTU[~np.isnan(df_NOAA['560'])] 
+    df_unc_HEREON_NOAA_match = df_unc_HEREON[~np.isnan(df_NOAA['560'])] 
+    
+
+    
+    #row 1 spectral reiduals plot
+    fig= plt.figure(figsize=(17,18))
+    
+    plt.rc('font',size=18)  
+  
+    percent_limits  = 25
+  
+    xlab = 'Wavelength [nm]'
+    ylab = '100($X_{Sensor}$ - $X_{R}$)/$X_{R}$: \n SeaPRISM  [%]'
+        
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML['560'])))
+    index = 1
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'A.', index, ylab, percent_limits, df_PML, df_SEAPRISM, bands)
+  
+    subtitle  = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA['560'])))
+    index = 2
+    _resid_subplot_nLw_v2(spec_type, subtitle,'B.', index, ylab, percent_limits, df_NASA, df_SEAPRISM, bands)
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU['560'])))
+    index = 3
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'C.', index, ylab, percent_limits, df_TARTU, df_SEAPRISM, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON['560'])))
+    index = 4
+    _resid_subplot_nLw_v2(spec_type,subtitle, 'D.', index, ylab,percent_limits, df_HEREON, df_SEAPRISM, bands)
+
+    xlab = 'Wavelength [nm]'
+    ylab = '100($X_{Sensor}$ - $X_{R}$)/$X_{R}$: \n HyperPro II [%]'
+
+    
+    subtitle = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_PML_NOAA_match['560'])))
+    index = 5
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'E.', index, ylab, percent_limits, df_PML, df_NOAA, bands)
+  
+    subtitle = 'pySAS: N = ' + str(np.sum(~np.isnan(df_NASA_NOAA_match['560'])))
+    index = 6
+    _resid_subplot_nLw_v2(spec_type, subtitle,'F.', index, ylab, percent_limits, df_NASA, df_NOAA, bands)
+
+    subtitle = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_NOAA_match['560'])))
+    index = 7
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'G.', index, ylab, percent_limits, df_TARTU, df_NOAA, bands)
+
+    subtitle = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_NOAA_match['560'])))
+    index = 8
+    _resid_subplot_nLw_v2(spec_type, subtitle, 'H.', index, ylab,percent_limits, df_HEREON, df_NOAA, bands)
+
+    percent_limits  = 20
+    ylab = 'Uncertainty: \n SeaPRISM match-ups [%]'
+    
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_unc_PML['560']))) 
+    index = 9
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'I.', index, ylab, percent_limits,  df_unc_PML, bands)
+
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_unc_NASA['560']))) 
+    index = 10
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'J.', index, ylab, percent_limits, df_unc_NASA, bands)
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_unc_TARTU['560'])))
+    index = 11
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'K.', index, ylab, percent_limits, df_unc_TARTU, bands)
+
+    subtitle  = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_unc_HEREON['560'])))
+    index = 12
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'.', index, ylab, percent_limits, df_unc_HEREON, bands)
+    
+    
+    
+    ylab = 'Uncertainty: \n HyperPro II match-ups [%]'
+    
+    subtitle  = 'HyperSAS: N = ' + str(np.sum(~np.isnan(df_unc_PML_NOAA_match['560']))) 
+    index = 13
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'M.', index, ylab, percent_limits, df_unc_PML_NOAA_match, bands)
+
+    subtitle  = 'pySAS: N = '  + str(np.sum(~np.isnan(df_NASA_NOAA_match['560']))) 
+    index = 14
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'N.', index, ylab, percent_limits, df_unc_NASA_NOAA_match, bands)
+
+    subtitle  = 'RAMSES-A: N = ' + str(np.sum(~np.isnan(df_TARTU_NOAA_match['560'])))
+    index = 15
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'O.', index, ylab, percent_limits, df_unc_HEREON_NOAA_match, bands)
+
+    subtitle = 'RAMSES-B: N = ' + str(np.sum(~np.isnan(df_HEREON_NOAA_match['560'])))
+    index = 16
+    _unc_subplot_CP_FRM_nLW(spec_type, subtitle,'P.', index, ylab, percent_limits, df_unc_TARTU_NOAA_match, bands)
+
+
+    plt.tight_layout(pad=1.2)
+    
+    
+    filename  =  path_output +  '/' + spec_type + '_nLw_summary_withUnc.png' 
     plt.savefig(filename, dpi=300)
     
 

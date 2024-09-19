@@ -75,9 +75,9 @@ if __name__ == '__main__':
     path_NLW = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/nLw_Zibordireference/'    
 
     # HCP output
-    dir_CP_class = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/' 
+    dir_CP_class = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/'
     dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/'
-/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/Z17_SimSpec
+
     # OLCI bands
     bands = [str(400), str(412.5), str(442.5),	str(490), str(510), str(560), str(620),	str(665), str(673.75), str(681.25), str(708.75), str(753.75), str(761.25), str(764.375), str(767.5), str(778.75), str(865), str(885), str(900)]
     

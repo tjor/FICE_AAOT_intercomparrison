@@ -299,8 +299,9 @@ def read_HEREON_RAFT_data(path, bands):
     files = sorted(os.listdir(path))
     data = np.nan*np.ones([78,18]) 
     station_index = [9, 10, 11, 18, 25, 26, 27, 28, 29 , 51, 52, 53, 54, 55, 62, 63, 65, 66] # cross-reference with xls metadata spreadsheet
-       
-    print()
+    
+#    breakpoint()
+ 
     for i in range(len(files)):
         text_i = np.loadtxt(path + files[i], skiprows = 1)
         data[station_index[i] ,:] = text_i[1, 1:] 
@@ -308,10 +309,9 @@ def read_HEREON_RAFT_data(path, bands):
     df = pd.DataFrame() 
     for i in range(len(bands)-1):
             df[str(bands[i])] = data[:,i] 
+  
 
     return df
-
-
 
 
 # NOAA read functions 
@@ -544,9 +544,10 @@ def read_Aeronet_nLw(path_NLW, Ed_R, bands):
     Units are mw/(cm^2 sr micro-m) - multiply by 10 to get  mw/(m^2 sr nm)'''
     
     # extract nLw data in data frame formate
-    files = os.listdir(path_NLW)
+    files = sorted(os.listdir(path_NLW))
     data = pd.DataFrame() 
     for i in range(len(files)): 
+        print(files[i])
         data_i = pd.read_csv(path_NLW + '/' + files[i], skiprows = 0)
         data.append(data_i)
         data = pd.concat([data, data_i]) #
@@ -557,8 +558,9 @@ def read_Aeronet_nLw(path_NLW, Ed_R, bands):
     time_nLw = [datetime.datetime.strptime(str(data_AOC['Time(hh:mm:ss)'][i]),'%H:%M:%S') for i in range(len(data_AOC))]
     timestamp_nLw = [datetime.datetime.combine(date_nLw[i].date(), time_nLw[i].time()) for i in range(len(data_AOC))] 
     timestamp_station = [datetime.datetime.strptime(Ed_R['time_start'][i],'%Y-%m-%d %H:%M:%S') + datetime.timedelta(0,2,30) for i in range(len(Ed_R))]       
-         
-    # fill up nLw data matrix based on time stamp matchung (similar approach to QC) - 
+
+ #   breakpoint()
+    # fill up nLw data matrix based on time stamp matchung (similar approach to QC) -
     keys_nLw = ['Lwn_f/Q[412nm]','Lwn_f/Q[443nm]','Lwn_f/Q[490nm]','Lwn_f/Q[510nm]','Lwn_f/Q[560nm]','Lwn_f/Q[620nm]','Lwn_f/Q[667nm]']
     nLw_data = np.nan*np.zeros([78, len(keys_nLw)])
     station = np.arange(0,78,1)
@@ -568,7 +570,7 @@ def read_Aeronet_nLw(path_NLW, Ed_R, bands):
         delta_t = abs(timestamp_station[i] - nearest_time) # time difference
         if delta_t.total_seconds() < tol:
             for j in range(len(keys_nLw)):
-                nLw_data[i,j] = 10*data_AOC[keys_nLw[j]][i] # factor 10 for unit conversion
+                nLw_data[i,j] = 10*data_AOC[keys_nLw[j]][nearest_index] # factor 10 for unit conversion
                 
     # fill up data frame with similar format as baseline references
     df_R = pd.DataFrame(index = station) 

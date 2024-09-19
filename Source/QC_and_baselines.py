@@ -249,6 +249,33 @@ def QC_mask(path_QC, Ed_R, Ed_PML, Lsky_PML, Rrs_PML, Rrs_std_PML, path_output):
     return df
 
 
+
+    
+def QC_mask_L2(path_QC, Ed_R, nLw_SEAPRISM,  path_output):
+    
+    ''' Function to derive QC mask using L2 Seaprism nLW matches
+    '''
+    
+
+    QC_AOC_3 = ~np.isnan(np.array(nLw_SEAPRISM['510']))
+    for i in range(len(QC_AOC_3)):
+        if QC_AOC_3[i]==True and Ed_R['N_mean'][i] > 2:
+            print(i)
+            QC_AOC_3[i] = 1
+        else:
+            QC_AOC_3[i] = 0
+    
+    #  fill up dataframe with QC fields present 
+    station = np.array(Ed_R.index)
+    df = pd.DataFrame(index = station)  
+    df['QC_AOC_3'] = QC_AOC_3 # default AOC QC
+ 
+    filename  =  path_output +  '/' + 'AAOT_QCmask_L2.csv'
+    df.to_csv(filename, na_rep ='NaN')
+    
+    return df
+
+
 def plot_dataandQCmasks(Q_mask, Ed_PML, Ed_TARTU, Ed_HEREON, Ed_NASA, Ed_RBINS, Ed_CNR,Ed_NOAA, path_output):
    
     '''plot to show data and QC masks for AAOT: (i) Data no QC, (ii) QC, 

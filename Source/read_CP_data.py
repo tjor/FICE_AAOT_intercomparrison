@@ -111,17 +111,17 @@ def read_hyperspectral(institute, var, dir_CP, class_based):
     if class_based == True:
         dir_data = dir_CP + institute + '/L2_no_NIR_Correction/' # common=processor  
     elif class_based == False:
-        # dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' + institute + '/'
+        dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' + institute + '/'
         # dir_data = dir_CP + institute + '/L2_Morel/' # common=processor
        # dir_data = dir_CP + institute + '/L2/'
         dir_data = dir_CP + institute #  
     print(dir_data)
     
-    breakpoint()
+    # breakpoint()
 
     files = glob.glob(dir_data + "/*.hdf")
 
-    breakpoint()
+    #breakpoint()
     
     print(len(files))
     # extract no. of timestamps (==stations) and no. of wavelengths
@@ -484,7 +484,7 @@ def time_match(df_CP, df_IP, bands):
     time_start_CP_matching = np.nan*np.ones(len(df_IP), dtype = object)  # mathching timestamps
     spec_data_matching = np.nan*np.ones([len(df_IP),len(df_IP.columns)]) # matching spectra
     tol = 10*60  #  buffer  - 10 mins originally used a buffer     
-   # tol = 1*60  #  buffer  - 10 mins originally used a buffer     
+   # tol = 5*60  #  buffer  - 10 mins originally used a buffer     
     for i in range(len(time_start_IP)):
          if time_start_IP[i] != None:
              nearest_time, nearest_index = nearest(time_start_CP, time_start_IP[i])
@@ -548,20 +548,17 @@ def read_CP_data(institute, Ed_IP, dir_CP, bands,class_based):
     Lsky, Lsky_unc, time, wv = read_hyperspectral(institute, 'LI_HYPER', dir_CP, class_based)    
     Lt, Lt_unc, time, wv = read_hyperspectral(institute, 'LT_HYPER', dir_CP, class_based)    
                                                                 
-    
     # spectral convolution - also applies to uncertainty
     Ed = hyperspec_to_OLCIbands(Ed, time, wv, srf, srf_bands, srf_wv)  
     Lsky = hyperspec_to_OLCIbands(Lsky, time, wv, srf, srf_bands, srf_wv)  
     Lt = hyperspec_to_OLCIbands(Lt, time, wv, srf, srf_bands, srf_wv) 
     Rrs = hyperspec_to_OLCIbands(Rrs, time, wv, srf, srf_bands, srf_wv) 
 
-    
     Ed_unc = hyperspec_to_OLCIbands(Ed_unc, time, wv, srf, srf_bands, srf_wv)  
     Lsky_unc = hyperspec_to_OLCIbands(Lsky_unc, time, wv, srf, srf_bands, srf_wv)  
     Lt_unc = hyperspec_to_OLCIbands(Lt_unc, time, wv, srf, srf_bands, srf_wv) 
     Rrs_unc = hyperspec_to_OLCIbands(Rrs_unc, time, wv, srf, srf_bands, srf_wv) 
 
-    
     Ed, Lsky, Lt, Rrs = time_match_allvars(Ed_IP, Ed, Lsky, Lt, Rrs, bands) # Ed_IP used for timestamps
     Ed_unc, Lsky_unc, Lt_unc, Rrs_unc = time_match_allvars(Ed_IP, Ed_unc, Lsky_unc, Lt_unc, Rrs_unc, bands)
   
