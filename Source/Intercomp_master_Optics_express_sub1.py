@@ -54,8 +54,8 @@ if __name__ == '__main__':
     
     # path to data + output
     dir_data = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/DataSubmissions'
-    path_output = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/Output_paper/nLw_final_Z17_SimSpec/'
-    # path_output = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/Output_paper/EdLtLsktRrs_final_M99_noNIR/' # use for Zhang 17 condfig
+    #path_output = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/Output_paper/nLw_final_Z17_SimSpec/'
+    path_output = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/Output_paper/EdLtLsktRrs_final_M99_noNIR/' # use for Zhang 17 condfig
 
     # team submissions  
     path_PML = dir_data + '/PML/FICE_submission_V4/FRM4SOC_2_FICE_22_AAOT_PML_HSAS_stationsummary_V4_rhoM99_nLw_localChl_noNIR_Earthsuncorrected.csv'
@@ -77,8 +77,8 @@ if __name__ == '__main__':
     path_NLW = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/System_intercomparrison/nLw_Zibordireference_L2/' # L2
     # HCP output 
     dir_CP_class = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/' # M99, no NIR
-    # dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/M99_NoNIR/' # M99, no NIR - FRM - used in Ed, Lt, Lsky, Rrs plots
-    dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/Z17_SimSpec/' # Z17, Sim spec.
+    dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/M99_NoNIR/' # M99, no NIR - FRM - used in Ed, Lt, Lsky, Rrs plots
+    #dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/Z17_SimSpec/' # Z17, Sim spec.
     # dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22-Reprocessed_12-23/' # M99, no NIR
     # dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_FRMbranch/' # M99. no NIR
     
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     Ed_TARTU, Lsky_TARTU, Lt_TARTU, Rrs_TARTU, Rrs_std_TARTU = rd_IP.read_TARTU_data(path_TARTU, bands) # no nLw yet
     Ed_HEREON, Lsky_HEREON, Lt_HEREON, Rrs_HEREON, Rrs_std_HEREON = rd_IP.read_HEREON_data(path_HEREON, bands) # no nLw yet
     Ed_RBINS, Lsky_RBINS, Lt_RBINS, Rrs_RBINS, Rrs_std_RBINS, nLw_RBINS = rd_IP.read_RBINS_data(path_RBINS, bands)
-    Ed_NOAA, Lsky_NOAA, Lt_NOAA, Rrs_NOAA, nLw_NOAA  = rd_IP.read_NOAA_data_V2(path_NOAA, bands, Ed_PML) # PML timestamps used to reference staion no.
+    Ed_NOAA, Lsky_NOAA, Lt_NOAA, Rrs_NOAA, nLw_NOAA = rd_IP.read_NOAA_data_V2(path_NOAA, bands, Ed_PML) # PML timestamps used to reference staion no.
     Ed_CNR, Lsky_CNR, Lt_CNR, Rrs_CNR, Rrs_std_CNR, nLw_CNR = rd_IP.read_CNR_data(path_CNR, bands)
    
     
@@ -108,6 +108,19 @@ if __name__ == '__main__':
     #Ed_TARTU_CP_FRM, Ed_unc_TARTU_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lt_TARTU_CP_FRM, Lt_unc_TARTU_CP_FRM,  Rrs_TARTU_CP_FRM, Rrs_unc_TARTU_CP_FRM = rd_CP.read_CP_data('TARTU', Ed_TARTU,  dir_CP_FRM, bands, class_based)
     # Ed_HEREON_CP_FRM, Ed_unc_HEREON_CP_FRM, Lsky_HEREON_CP_FRM, Lsky_unc_HEREON_CP_FRM, Lt_HEREON_CP_FRM, Lt_unc_HEREON_CP_FRM, Rrs_HEREON_CP_FRM, Rrs_unc_HEREON_CP_FRM = rd_CP.read_CP_data('HEREON', Ed_PML, dir_CP_FRM, bands, class_based) # PML timestamp used as HEREON did not include this (systems were close to synchronous)  
     #Ed_NASA_CP_FRM, Ed_unc_NASA_CP_FRM, Lsky_NASA_CP_FRM, Lsky_unc_NASA_CP_FRM, Lt_NASA_CP_FRM, Lt_unc_NASA_CP_FRM, Rrs_NASA_CP_FRM, Rrs_unc_NASA_CP_FRM = rd_CP.read_CP_data('NASA', Ed_NASA,  dir_CP_FRM, bands,  class_based) # 
+
+    dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/Z17_SimSpec/' # Load Sim-spec first for HyperPro plot - label nLw fields with explict Z17
+    Ed_PML_CP_FRM, Ed_unc_PML_CP_FRM, Lsky_PML_CP_FRM, Lsky_unc_PML_CP_FRM, Lt_PML_CP_FRM, Lt_unc_PML_CP_FRM,  Rrs_PML_CP_FRM, Rrs_unc_PML_CP_FRM, nLw_PML_CP_FRM_Z17, nLw_unc_PML_CP_FRM_Z17 = rd_CP.read_CP_data_withnLw('PML', Ed_PML, dir_CP_FRM, bands, class_based) # Ed dataframe used for timestamp
+    Ed_TARTU_CP_FRM, Ed_unc_TARTU_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lt_TARTU_CP_FRM, Lt_unc_TARTU_CP_FRM,  Rrs_TARTU_CP_FRM, Rrs_unc_TARTU_CP_FRM, nLw_TARTU_CP_FRM_Z17, nLw_unc_TARTU_CP_FRM_Z17 = rd_CP.read_CP_data_withnLw('TARTU', Ed_TARTU,  dir_CP_FRM, bands, class_based)
+    Ed_HEREON_CP_FRM, Ed_unc_HEREON_CP_FRM, Lsky_HEREON_CP_FRM, Lsky_unc_HEREON_CP_FRM, Lt_HEREON_CP_FRM, Lt_unc_HEREON_CP_FRM, Rrs_HEREON_CP_FRM, Rrs_unc_HEREON_CP_FRM, nLw_HEREON_CP_FRM_Z17, nLw_unc_HEREON_CP_FRM_Z17 = rd_CP.read_CP_data_withnLw('HEREON', Ed_PML, dir_CP_FRM, bands, class_based) # PML timestamp used as HEREON did not include this (systems were close to synchronous)
+    Ed_NASA_CP_FRM, Ed_unc_NASA_CP_FRM, Lsky_NASA_CP_FRM, Lsky_unc_NASA_CP_FRM, Lt_NASA_CP_FRM, Lt_unc_NASA_CP_FRM, Rrs_NASA_CP_FRM, Rrs_unc_NASA_CP_FRM, nLw_NASA_CP_FRM_Z17, nLw_unc_NASA_CP_FRM_Z17  = rd_CP.read_CP_data_withnLw('NASA', Ed_NASA,  dir_CP_FRM, bands,  class_based) # 
+
+    dir_CP_FRM = '/data/datasets/cruise_data/active/FRM4SOC_2/FICE22/CP/FICE22_v1.2.4_coserror_revised/M99_NoNIR/' # all fields apart from nLW_Z17 will now be overwritten
+    Ed_PML_CP_FRM, Ed_unc_PML_CP_FRM, Lsky_PML_CP_FRM, Lsky_unc_PML_CP_FRM, Lt_PML_CP_FRM, Lt_unc_PML_CP_FRM,  Rrs_PML_CP_FRM, Rrs_unc_PML_CP_FRM, nLw_PML_CP_FRM, nLw_unc_PML_CP_FRM = rd_CP.read_CP_data_withnLw('PML', Ed_PML, dir_CP_FRM, bands, class_based) # Ed dataframe used for timestamp
+    Ed_TARTU_CP_FRM, Ed_unc_TARTU_CP_FRM, Lsky_TARTU_CP_FRM, Lsky_unc_TARTU_CP_FRM, Lt_TARTU_CP_FRM, Lt_unc_TARTU_CP_FRM,  Rrs_TARTU_CP_FRM, Rrs_unc_TARTU_CP_FRM, nLw_TARTU_CP_FRM, nLw_unc_TARTU_CP_FRM = rd_CP.read_CP_data_withnLw('TARTU', Ed_TARTU,  dir_CP_FRM, bands, class_based)
+    Ed_HEREON_CP_FRM, Ed_unc_HEREON_CP_FRM, Lsky_HEREON_CP_FRM, Lsky_unc_HEREON_CP_FRM, Lt_HEREON_CP_FRM, Lt_unc_HEREON_CP_FRM, Rrs_HEREON_CP_FRM, Rrs_unc_HEREON_CP_FRM, nLw_HEREON_CP_FRM, nLw_unc_HEREON_CP_FRM = rd_CP.read_CP_data_withnLw('HEREON', Ed_PML, dir_CP_FRM, bands, class_based) # PML timestamp used as HEREON did not include this (systems were close to synchronous)
+    Ed_NASA_CP_FRM, Ed_unc_NASA_CP_FRM, Lsky_NASA_CP_FRM, Lsky_unc_NASA_CP_FRM, Lt_NASA_CP_FRM, Lt_unc_NASA_CP_FRM, Rrs_NASA_CP_FRM, Rrs_unc_NASA_CP_FRM, nLw_NASA_CP_FRM, nLw_unc_NASA_CP_FRM  = rd_CP.read_CP_data_withnLw('NASA', Ed_NASA,  dir_CP_FRM, bands,  class_based) # 
+
     
     # Read Community Procsssed data  - FRM/SS branch  Versions with nLw 
     Ed_PML_CP_FRM, Ed_unc_PML_CP_FRM, Lsky_PML_CP_FRM, Lsky_unc_PML_CP_FRM, Lt_PML_CP_FRM, Lt_unc_PML_CP_FRM,  Rrs_PML_CP_FRM, Rrs_unc_PML_CP_FRM, nLw_PML_CP_FRM, nLw_unc_PML_CP_FRM = rd_CP.read_CP_data_withnLw('PML', Ed_PML, dir_CP_FRM, bands, class_based) # Ed dataframe used for timestamp
@@ -346,19 +359,29 @@ if __name__ == '__main__':
                  bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
 
 
-   #obsolete versions of nLw plot functions
-  #  rp.residuals_combined_nlw_v2('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, 
+   # obsolete versions of nLw plot functions
+   #  rp.residuals_combined_nlw_v2('nLw', nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, 
     #                              nLw_PML_CP_FRM, nLw_NASA_CP_FRM, nLw_TARTU_CP_FRM, nLw_HEREON_CP_FRM, bands, 
    #                               path_output, Q_mask, Qtype = 'QC_AOC_3') 
   
- #   rp.unc_plot_nLw(nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, 
+  #   rp.unc_plot_nLw(nLw_SEAPRISM, nLw_NOAA, nLw_RAFT, 
   #                               nLw_unc_PML_CP_FRM, nLw_unc_NASA_CP_FRM, nLw_unc_TARTU_CP_FRM, nLw_unc_HEREON_CP_FRM,
    #                              bands, path_output, Q_mask, Qtype = 'QC_AOC_3')
                                
-    rp.residuals_unc_nlw('nLw',  nLw_SEAPRISM, nLw_NOAA,
+    # rp.residuals_unc_nlw('nLw',  nLw_SEAPRISM, nLw_NOAA,
+     #                            nLw_PML_CP_FRM, nLw_NASA_CP_FRM, nLw_TARTU_CP_FRM, nLw_HEREON_CP_FRM, 
+      #                           nLw_unc_PML_CP_FRM, nLw_unc_NASA_CP_FRM, nLw_unc_TARTU_CP_FRM, nLw_unc_HEREON_CP_FRM,
+       #                          bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+       
+    rp.residuals_unc_nlw_SeaPrism('nLw',  nLw_SEAPRISM, 
+                                     nLw_PML_CP_FRM, nLw_NASA_CP_FRM, nLw_TARTU_CP_FRM, nLw_HEREON_CP_FRM, 
+                                     nLw_unc_PML_CP_FRM, nLw_unc_NASA_CP_FRM, nLw_unc_TARTU_CP_FRM, nLw_unc_HEREON_CP_FRM,
+                                     bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
+      
+    rp.residuals_unc_nlw_hyperpro('nLw', nLw_NOAA,
                                  nLw_PML_CP_FRM, nLw_NASA_CP_FRM, nLw_TARTU_CP_FRM, nLw_HEREON_CP_FRM, 
                                  nLw_unc_PML_CP_FRM, nLw_unc_NASA_CP_FRM, nLw_unc_TARTU_CP_FRM, nLw_unc_HEREON_CP_FRM,
+                                 nLw_PML_CP_FRM_Z17, nLw_NASA_CP_FRM_Z17, nLw_TARTU_CP_FRM_Z17, nLw_HEREON_CP_FRM_Z17, 
+                                 nLw_unc_PML_CP_FRM_Z17, nLw_unc_NASA_CP_FRM_Z17, nLw_unc_TARTU_CP_FRM_Z17, nLw_unc_HEREON_CP_FRM_Z17,
                                  bands, path_output, Q_mask, Qtype = 'QC_AOC_3') 
-  
-
-    
+       
